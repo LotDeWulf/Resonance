@@ -1,0 +1,50 @@
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    background: black;
+    overflow: hidden;
+  }
+  #emotionVideo {
+    width: 100vw;
+    height: 100vh;
+    object-fit: cover;
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+  h1 {
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0,0,0,0.5);
+    color: white;
+    padding: 10px 30px;
+    border-radius: 10px;
+    z-index: 2;
+    font-size: 2em;
+  }
+  #videoContainer {
+    position: fixed;
+    top: 0; left: 0; width: 100vw; height: 100vh;
+    overflow: hidden;
+  }
+  #videoA, #videoB {
+    position: absolute;
+    top: 0; left: 0; width: 100vw; height: 100vh;
+    object-fit: cover;
+    transition: opacity 0.7s;
+    z-index: 1;
+    background: black;
+    opacity: 0;
+    pointer-events: none;
+  }
+  #videoA.show, #videoB.show {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  #videoA.hide, #videoB.hide {
+    opacity: 0;
+    pointer-events: none;
+  }
