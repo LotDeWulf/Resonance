@@ -16,11 +16,25 @@ const emotionToVideos = {
   surprise: ["zwart_gat.mp4", "stars.mp4", "kwallen.mp4"]
 };
 
+const audioMap = {
+  'bloemen.mp4': '/static/Audio/bloemen.wav',
+  'waves.mp4': '/static/Audio/golven.wav',
+  'lava.mp4': '/static/Audio/lava.wav',
+  'mist.mp4': '/static/Audio/mist.wav',
+  'regen.mp4': '/static/Audio/regen.wav',
+  'regen 2.mp4': '/static/Audio/regenBW.wav',
+  'vuur.mp4': '/static/Audio/vuur.wav',
+  'water.mp4': '/static/Audio/Water.wav',
+  'wolken.mp4': '/static/Audio/wolken.wav',
+  // Voeg hier eventueel meer mappings toe
+};
+
 const videoA = document.getElementById('videoA');
 const videoB = document.getElementById('videoB');
 let showingA = true;
 let lastEmotion = null;
 let lastFilename = null;
+let currentAudio = null;
 const socket = io();
 
 // Init: videoA zichtbaar, videoB onzichtbaar
@@ -37,6 +51,21 @@ socket.on('emotion', function(data) {
   if (options.length === 0) options = videoList;
   const filename = options[Math.floor(Math.random() * options.length)];
   if (!filename) return;
+  // Audio afspelen als bloemen.mp4 wordt afgespeeld
+  if (audioMap[filename]) {
+    if (currentAudio) {
+      currentAudio.pause();
+      currentAudio.currentTime = 0;
+    }
+    currentAudio = new Audio(audioMap[filename]);
+    currentAudio.currentTime = 0;
+    currentAudio.volume = 1.0;
+    currentAudio.play().catch(e => { console.warn('Audio play error:', e); });
+  } else if (currentAudio) {
+    currentAudio.pause();
+    currentAudio.currentTime = 0;
+    currentAudio = null;
+  }
   const nextVideo = showingA ? videoB : videoA;
   const prevVideo = showingA ? videoA : videoB;
   nextVideo.src = `/static/videos/${filename}?t=${Date.now()}`;
