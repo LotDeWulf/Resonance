@@ -1,8 +1,8 @@
-# Facial-Emotion-Recognition-using-OpenCV-and-Deepface
-This project implements real-time facial emotion detection using the `deepface` library and OpenCV. It captures video from the webcam, detects faces, and predicts the emotions associated with each face. The emotion labels are displayed on the frames in real-time.
-This is probably the shortest code to implement realtime emotion monitoring.
-- Give this repository a ⭐ if you liked it, since it took me time to understand and implement this
-- Made with ❤️ by [Manish Tiwari](https://github.com/manish-9245)
+# RESONANCE
+This project implements real-time facial emotion detection using the `deepface` library and OpenCV. It captures video from the webcam, detects faces, predicts the emotions associated with each face and selects a video and musical piece reflecting the most dominant emotion every few seconds. 
+To make this project come to life we used the "Facial-Emotion-Recognition-using-OpenCV-and-Deepface"(https://github.com/manish-9245/Facial-Emotion-Recognition-using-OpenCV-and-Deepface/) repository as a base, made by [Manish Tiwari](https://github.com/manish-9245).
+- Give this repository a ⭐ if you liked it, we would appreciate it!
+- The Resonance team <3
 
 ## Dependencies
 
@@ -11,22 +11,23 @@ This is probably the shortest code to implement realtime emotion monitoring.
 
 ## Usage
 ### Initial steps:
-- Git clone this repository Run: `git clone https://github.com/manish-9245/Facial-Emotion-Recognition-using-OpenCV-and-Deepface.git`
-- Run: `cd Facial-Emotion-Recognition-using-OpenCV-and-Deepface`
+- Git clone this repository Run: `git clone https://github.com/LotDeWulf/resonance.git`
+- Run: `cd resonance`
 1. Install the required dependencies:
    - You can use `pip install -r requirements.txt`
    - Or you can install dependencies individually:
       - `pip install deepface`
       - `pip install tf_keras`
       - `pip install opencv-python`
+      - `pip install flask-socketio`
 
 2. Download the Haar cascade XML file for face detection:
    - Visit the [OpenCV GitHub repository](https://github.com/opencv/opencv/tree/master/data/haarcascades) and download the `haarcascade_frontalface_default.xml` file.
 
 3. Run the code:
    - Execute the Python script.
-   - The webcam will open, and real-time facial emotion detection will start.
-   - Emotion labels will be displayed on the frames around detected faces.
+   - The webcam will turn on, and real-time facial emotion detection will start.
+   - Videos will be played based on the emotions that are being detected.
 
 ## Approach
 
