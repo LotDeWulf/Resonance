@@ -1,2 +1,4 @@
 # Negeer alle video's in static/videos/videos/
 static/videos/
+# Negeer de map Audio in static
+static/Audio/
