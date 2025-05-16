@@ -1,6 +1,6 @@
 # RESONANCE
 This project implements real-time facial emotion detection using the `deepface` library and OpenCV. It captures video from the webcam, detects faces, predicts the emotions associated with each face and selects a video and musical piece reflecting the most dominant emotion every few seconds. 
-To make this project come to life we used the "Facial-Emotion-Recognition-using-OpenCV-and-Deepface"(https://github.com/manish-9245/Facial-Emotion-Recognition-using-OpenCV-and-Deepface/) repository as a base, made by [Manish Tiwari](https://github.com/manish-9245).
+To make this project come to life we used the ["Facial-Emotion-Recognition-using-OpenCV-and-Deepface"](https://github.com/manish-9245/Facial-Emotion-Recognition-using-OpenCV-and-Deepface/) repository as a base, made by [Manish Tiwari](https://github.com/manish-9245).
 - Give this repository a ⭐ if you liked it, we would appreciate it!
 - The Resonance team <3
 
