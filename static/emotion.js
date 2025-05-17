@@ -1,3 +1,106 @@
+// ademhalingsoefening //
+var socket = io();
+let breathingActive = false;  // global flag om overlappende ademhalingsoefeningen te voorkomen
+
+socket.on('breathing_exercise', function(data) {
+    if (data.start) {
+        // Als een ademhalingsoefening al wordt uitgevoerd, negeer dan de nieuwe trigger
+        if (breathingActive) return;
+        breathingActive = true;
+        
+        const msgElem = document.getElementById('exerciseMessage');
+        // Wis alle eerdere inhoud
+        msgElem.innerHTML = "";
+        
+        // Initiële bericht met een span met achtergrondschaduw
+        let msgText = document.createElement("span");
+        msgText.textContent = "You are too stressed, time for a breathing exercise!";
+        msgText.style.color = "white";
+        msgText.style.padding = "10px";
+        msgText.style.borderRadius = "4px";
+        msgText.style.textShadow = "0 0 10px rgba(0,0,0,0.8)";
+        msgElem.appendChild(msgText);
+        
+        // Verwijder na 2 seconden de berichttekst en voeg de cirkel toe (zonder de schaduw)
+        setTimeout(function() {
+            msgElem.removeChild(msgText);
+            
+            // Cirkel div met achtergrondafbeelding
+            let circle = document.createElement("div");
+            circle.id = "breathingCircle";
+            circle.style.width = "50px";
+            circle.style.height = "50px";
+            circle.style.borderRadius = "50%";
+
+            circle.style.backgroundImage = "url('/static/img/circle.png')";
+            circle.style.backgroundSize = "cover";
+            circle.style.display = "flex";
+            circle.style.justifyContent = "center";
+            circle.style.alignItems = "center";
+            circle.style.fontSize = "16px";
+            circle.style.color = "white";
+            
+            msgElem.appendChild(circle);
+
+            // Functie om één cyclus van de animatie uit te voeren
+            // Elke cyclus: 7s inhale, 5s hold, 5s hold, 7s exhale = 24s totaal.
+            function runCycle(count) {
+                // Cirkel resetten naar de begintoestand voor de cyclus
+                circle.style.transition = "";
+                circle.style.width = "50px";
+                circle.style.height = "50px";
+                circle.style.fontSize = "16px";
+                circle.textContent = "inhale";
+                
+                // Na een kleine vertraging, animeer de expansie (inhale) gedurende 7 seconden
+                setTimeout(function() {
+                    circle.style.transition = "width 7s, height 7s, font-size 7s";
+                    circle.style.width = "300px";
+                    circle.style.height = "300px";
+                    circle.style.fontSize = "32px";
+                }, 50);
+                
+                // Verander na 7 seconden de tekst naar "hold" (eerste hold)
+                setTimeout(function() {
+                    circle.textContent = "hold";
+                }, 7000);
+                
+                // Na nog eens 5 seconden (totaal 12s), "hold" aanhouden (tweede hold)
+                // Wordt nog aangepast, 12 sec hold is vrij lang lol
+                setTimeout(function() {
+                    circle.textContent = "hold";
+                }, 7000 + 5000);
+                
+                // Na nog eens 5 seconden (totaal 17s), trigger exhale
+                setTimeout(function() {
+                    circle.textContent = "exhale";
+                    circle.style.transition = "width 7s, height 7s, font-size 7s";
+                    circle.style.width = "50px";
+                    circle.style.height = "50px";
+                    circle.style.fontSize = "16px";
+                }, 7000 + 5000 + 5000);
+                
+                // Na de volledige cyclus (24s), voer de volgende cyclus uit
+                // of verwijder de cirkel als het aantal cyclusen 3 is
+                setTimeout(function() {
+                    if(count < 3) {
+                        runCycle(count + 1);
+                    } else {
+                        msgElem.removeChild(circle);
+                        breathingActive = false;  // Flag resetten wanneer de animatie klaar is
+                    }
+                }, 7000 + 5000 + 5000 + 7000);
+            }
+            
+            // Start de eerste cyclus
+            runCycle(1);
+            
+        }, 4000);
+    }
+});
+// Einde ademhalingsoefening
+
+
 const deepfaceToKey = {
   happy: "happy",
   angry: "angry",
@@ -6,7 +109,7 @@ const deepfaceToKey = {
   sad: "sad",
   surprise: "surprise",
   surprised: "surprise"
-};
+}; 
 
 const emotionToVideos = {
   happy: ["bloemen.mp4", "water.mp4", "wolken.mp4"],
@@ -35,7 +138,7 @@ let showingA = true;
 let lastEmotion = null;
 let lastFilename = null;
 let currentAudio = null;
-const socket = io();
+
 
 // Init: videoA zichtbaar, videoB onzichtbaar
 videoA.classList.add('show');
