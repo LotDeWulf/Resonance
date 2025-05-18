@@ -59,7 +59,7 @@ def detect_emotion():
         except Exception as e:
             print("Fout:", e)
 
-        time.sleep(5)
+        time.sleep(10)
 
 threading.Thread(target=detect_emotion, daemon=True).start()
 

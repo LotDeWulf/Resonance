@@ -193,7 +193,7 @@ socket.on('emotion', function(data) {
       prevVideo.classList.add('hide');
       prevVideo.style.opacity = '';
       nextVideo.style.opacity = '';
-    }, 4000); // pas evt. aan als je crossfade tijd wijzigt
+    }, 5000); // pas evt. aan als je crossfade tijd wijzigt
     showingA = !showingA;
     lastFilename = filename;
   };
