@@ -205,7 +205,7 @@ function showWelcomeOverlay() {
   if (!overlay) {
     overlay = document.createElement('div');
     overlay.id = 'welcomeOverlay';
-    overlay.style.flexDirection = 'column'; // Zorg dat tekst onder elkaar staat
+    overlay.style.flexDirection = 'column'; // Zorgt dat tekst onder elkaar staat
     let text = document.createElement('span');
     text.textContent = 'WELCOME';
     text.className = 'welcome-title';
@@ -216,7 +216,7 @@ function showWelcomeOverlay() {
     subtext.className = 'welcome-subtext';
     overlay.appendChild(subtext);
     document.body.appendChild(overlay);
-    // Na 7.5 seconden tekst veranderen met fade-out/fade-in effect
+    // Na 7.5 seconden tekst verandert met fade-out/fade-in effect
     setTimeout(() => {
       text.style.transition = 'opacity 0.7s';
       subtext.style.transition = 'opacity 0.7s';
