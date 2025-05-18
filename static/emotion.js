@@ -120,15 +120,21 @@ const emotionToVideos = {
 };
 
 const audioMap = {
-  'bloemen.mp4': '/static/Audio/bloemen.wav',
+  'bloemen.mp4': '/static/Audio/Bloemen.mp4',
+  'water.mp4': '/static/Audio/Water.mp4',
+  'wolken.mp4': '/static/Audio/Wolken.mp4',
   'waves.mp4': '/static/Audio/golven.wav',
+  'vuur.mp4': '/static/Audio/Vuur.mp4',
   'lava.mp4': '/static/Audio/lava.wav',
-  'mist.mp4': '/static/Audio/mist.wav',
-  'regen.mp4': '/static/Audio/regen.wav',
+  'kwal.mp4': '/static/Audio/Kwal.mp4',
+  'storm.mp4': '/static/Audio/Storm.mp4',
+  'thunder.mp4': '/static/Audio/Donder.mp4',
+  'mist.mp4': '/static/Audio/Mist.mp4',
+  'regen.mp4': '/static/Audio/Regen.mp4',
   'regen 2.mp4': '/static/Audio/regenBW.wav',
-  'vuur.mp4': '/static/Audio/vuur.wav',
-  'water.mp4': '/static/Audio/Water.wav',
-  'wolken.mp4': '/static/Audio/wolken.wav',
+  'zwart_gat.mp4': 'static/Audio/Surprise [Black-Hole - Light-Star-Zoom - Group-Of-Jellyfish].wav',
+  'stars.mp4': 'static/Audio/Surprise [Black-Hole - Light-Star-Zoom - Group-Of-Jellyfish].wav',
+  'kwallen.mp4': 'static/Audio/Surprise [Black-Hole - Light-Star-Zoom - Group-Of-Jellyfish].wav',
   // Voeg hier eventueel meer mappings toe
 };
 
@@ -138,6 +144,8 @@ let showingA = true;
 let lastEmotion = null;
 let lastFilename = null;
 let currentAudio = null;
+let lastVideoSwitch = 0; // timestamp van laatste video-wissel
+let fadeDuration = 1000; // duur van crossfade in ms
 
 
 // Init: videoA zichtbaar, videoB onzichtbaar
@@ -145,6 +153,10 @@ videoA.classList.add('show');
 videoB.classList.add('hide');
 
 socket.on('emotion', function(data) {
+  const now = Date.now();
+  if (now - lastVideoSwitch < 10000) return; // 10 seconden wachten tussen wissels
+  lastVideoSwitch = now;
+  
   const rawEmotion = data.emotion;
   const emotion = deepfaceToKey[rawEmotion];
   const videoList = emotionToVideos[emotion];
@@ -154,16 +166,40 @@ socket.on('emotion', function(data) {
   if (options.length === 0) options = videoList;
   const filename = options[Math.floor(Math.random() * options.length)];
   if (!filename) return;
-  // Audio afspelen als bloemen.mp4 wordt afgespeeld
+  // --- Crossfade audio ---
   if (audioMap[filename]) {
+    let newAudio = new Audio(audioMap[filename]);
+    newAudio.currentTime = 0;
+    newAudio.volume = 0;
+    newAudio.play().then(() => {
+      // Fade in nieuwe audio
+      let fadeInStart = Date.now();
+      function fadeIn() {
+        let elapsed = Date.now() - fadeInStart;
+        let vol = Math.min(1, elapsed / fadeDuration);
+        newAudio.volume = vol;
+        if (vol < 1) requestAnimationFrame(fadeIn);
+      }
+      fadeIn();
+    }).catch(e => { console.warn('Audio play error:', e); });
+    // Fade out oude audio
     if (currentAudio) {
-      currentAudio.pause();
-      currentAudio.currentTime = 0;
+      let oldAudio = currentAudio;
+      let fadeOutStart = Date.now();
+      function fadeOut() {
+        let elapsed = Date.now() - fadeOutStart;
+        let vol = Math.max(0, 1 - (elapsed / fadeDuration));
+        oldAudio.volume = vol;
+        if (vol > 0) {
+          requestAnimationFrame(fadeOut);
+        } else {
+          oldAudio.pause();
+          oldAudio.currentTime = 0;
+        }
+      }
+      fadeOut();
     }
-    currentAudio = new Audio(audioMap[filename]);
-    currentAudio.currentTime = 0;
-    currentAudio.volume = 1.0;
-    currentAudio.play().catch(e => { console.warn('Audio play error:', e); });
+    currentAudio = newAudio;
   } else if (currentAudio) {
     currentAudio.pause();
     currentAudio.currentTime = 0;
