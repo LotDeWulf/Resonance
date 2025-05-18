@@ -145,7 +145,8 @@ let lastEmotion = null;
 let lastFilename = null;
 let currentAudio = null;
 let lastVideoSwitch = 0; // timestamp van laatste video-wissel
-let fadeDuration = 1000; // duur van crossfade in ms
+let fadeDuration = 1500; // duur van crossfade in ms (1.5s)
+let fadeDelay = 500; // nieuwe audio fade-in start na 0.5s
 
 
 // Init: videoA zichtbaar, videoB onzichtbaar
@@ -169,7 +170,6 @@ socket.on('emotion', function(data) {
   // --- Crossfade audio ---
   if (audioMap[filename]) {
     let newAudio = new Audio(audioMap[filename]);
-    // Start op willekeurige plek in de audio (maximaal tot 90% van de lengte, rest fade-out)
     newAudio.addEventListener('loadedmetadata', function() {
       if (newAudio.duration && isFinite(newAudio.duration)) {
         let maxStart = Math.max(0, newAudio.duration * 0.9);
@@ -178,33 +178,35 @@ socket.on('emotion', function(data) {
     });
     newAudio.volume = 0;
     newAudio.play().then(() => {
-      // Fade in nieuwe audio
-      let fadeInStart = Date.now();
-      function fadeIn() {
-        let elapsed = Date.now() - fadeInStart;
-        let vol = Math.min(1, elapsed / fadeDuration);
-        newAudio.volume = vol;
-        if (vol < 1) requestAnimationFrame(fadeIn);
-      }
-      fadeIn();
-    }).catch(e => { console.warn('Audio play error:', e); });
-    // Fade out oude audio
-    if (currentAudio) {
-      let oldAudio = currentAudio;
-      let fadeOutStart = Date.now();
-      function fadeOut() {
-        let elapsed = Date.now() - fadeOutStart;
-        let vol = Math.max(0, 1 - (elapsed / fadeDuration));
-        oldAudio.volume = vol;
-        if (vol > 0) {
-          requestAnimationFrame(fadeOut);
-        } else {
-          oldAudio.pause();
-          oldAudio.currentTime = 0;
+      // Fade out oude audio
+      if (currentAudio) {
+        let oldAudio = currentAudio;
+        let fadeOutStart = Date.now();
+        function fadeOut() {
+          let elapsed = Date.now() - fadeOutStart;
+          let vol = Math.max(0, 1 - (elapsed / fadeDuration));
+          oldAudio.volume = vol;
+          if (vol > 0) {
+            requestAnimationFrame(fadeOut);
+          } else {
+            oldAudio.pause();
+            oldAudio.currentTime = 0;
+          }
         }
+        fadeOut();
       }
-      fadeOut();
-    }
+      // Fade in nieuwe audio na fadeDelay
+      setTimeout(() => {
+        let fadeInStart = Date.now();
+        function fadeIn() {
+          let elapsed = Date.now() - fadeInStart;
+          let vol = Math.min(1, elapsed / fadeDuration);
+          newAudio.volume = vol;
+          if (vol < 1) requestAnimationFrame(fadeIn);
+        }
+        fadeIn();
+      }, fadeDelay);
+    }).catch(e => { console.warn('Audio play error:', e); });
     currentAudio = newAudio;
   } else if (currentAudio) {
     currentAudio.pause();
