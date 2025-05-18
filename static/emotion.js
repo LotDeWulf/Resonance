@@ -198,3 +198,50 @@ socket.on('emotion', function(data) {
     lastFilename = filename;
   };
 });
+
+// --- WELCOME overlay ---
+function showWelcomeOverlay() {
+  let overlay = document.getElementById('welcomeOverlay');
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.id = 'welcomeOverlay';
+    overlay.style.flexDirection = 'column'; // Zorg dat tekst onder elkaar staat
+    let text = document.createElement('span');
+    text.textContent = 'WELCOME';
+    text.className = 'welcome-title';
+    overlay.appendChild(text);
+    // Extra regel onder welcome
+    let subtext = document.createElement('span');
+    subtext.textContent = 'Stand on the colored dot';
+    subtext.className = 'welcome-subtext';
+    overlay.appendChild(subtext);
+    document.body.appendChild(overlay);
+    // Na 7.5 seconden tekst veranderen met fade-out/fade-in effect
+    setTimeout(() => {
+      text.style.transition = 'opacity 0.7s';
+      subtext.style.transition = 'opacity 0.7s';
+      text.style.opacity = '0';
+      subtext.style.opacity = '0';
+      setTimeout(() => {
+        text.textContent = 'Change your facial expression and explore';
+        text.className = 'welcome-subtext';
+        text.style.textAlign = 'center';
+        subtext.textContent = '';
+        text.style.opacity = '1';
+        subtext.style.opacity = '1';
+      }, 700);
+    }, 7500);
+  } else {
+    overlay.style.display = 'flex';
+    overlay.style.opacity = '1';
+  }
+  setTimeout(() => {
+    overlay.style.opacity = '0';
+    setTimeout(() => { overlay.style.display = 'none'; }, 1000);
+  }, 15000); // 15 seconden
+}
+
+// Toon direct bij het laden
+showWelcomeOverlay();
+// Herhaal elke 15 minuten
+setInterval(showWelcomeOverlay, 15 * 60 * 1000);
