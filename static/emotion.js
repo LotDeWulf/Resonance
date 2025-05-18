@@ -169,7 +169,13 @@ socket.on('emotion', function(data) {
   // --- Crossfade audio ---
   if (audioMap[filename]) {
     let newAudio = new Audio(audioMap[filename]);
-    newAudio.currentTime = 0;
+    // Start op willekeurige plek in de audio (maximaal tot 90% van de lengte, rest fade-out)
+    newAudio.addEventListener('loadedmetadata', function() {
+      if (newAudio.duration && isFinite(newAudio.duration)) {
+        let maxStart = Math.max(0, newAudio.duration * 0.9);
+        newAudio.currentTime = Math.random() * maxStart;
+      }
+    });
     newAudio.volume = 0;
     newAudio.play().then(() => {
       // Fade in nieuwe audio
