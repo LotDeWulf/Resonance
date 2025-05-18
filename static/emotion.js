@@ -185,8 +185,8 @@ socket.on('emotion', function(data) {
     nextVideo.style.opacity = 1;
     prevVideo.style.opacity = 0;
     nextVideo.play();
-    nextVideo.playbackRate = 0.1;
-    prevVideo.playbackRate = 0.1;
+    nextVideo.playbackRate = 1.0; // Zet op normale snelheid
+    prevVideo.playbackRate = 1.0; // Zet op normale snelheid
     // Na de transition de oude video verbergen
     setTimeout(() => {
       prevVideo.classList.remove('show');
