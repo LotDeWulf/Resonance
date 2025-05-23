@@ -215,6 +215,7 @@ function crossfadeAudio(newSrc) {
         } else {
           oldAudio.volume = 0;
           oldAudio.pause();
+          oldAudio.currentTime = 0;
           clearInterval(fadeInterval);
         }
       }, fadeIntervalTime);
@@ -222,8 +223,9 @@ function crossfadeAudio(newSrc) {
     }
     return;
   }
-  if (currentAudio && currentAudio.src.endsWith(newSrc)) {
-
+  // Vergelijk altijd absolute paden
+  const absNewSrc = new URL(newSrc, window.location.origin).href;
+  if (currentAudio && currentAudio.src === absNewSrc) {
     if (currentAudio.paused) currentAudio.play();
     return;
   }
@@ -232,9 +234,7 @@ function crossfadeAudio(newSrc) {
   let nextAudio = new Audio(newSrc);
   nextAudio.volume = 0;
   nextAudio.loop = true;
-  // Start pas met crossfade als metadata geladen is (duration bekend)
   nextAudio.addEventListener('loadedmetadata', function startRandom() {
-    // Random starttijd tussen 0 en duration
     if (nextAudio.duration && isFinite(nextAudio.duration)) {
       nextAudio.currentTime = Math.random() * nextAudio.duration;
     }
