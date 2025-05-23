@@ -154,6 +154,15 @@ let fadeIntervalTime = 30; // snellere interval voor smoothness
 videoA.classList.add('show');
 videoB.classList.add('hide');
 
+// Haal de 'screen' parameter uit de URL (left, center, right)
+function getScreenPart() {
+  const params = new URLSearchParams(window.location.search);
+  const part = params.get('screen');
+  if (['left','center','right'].includes(part)) return part;
+  return 'center'; // default
+}
+const screenPart = getScreenPart();
+
 socket.on('emotion', function(data) {
   const rawEmotion = data.emotion;
   const emotion = deepfaceToKey[rawEmotion];
@@ -164,20 +173,11 @@ socket.on('emotion', function(data) {
   if (options.length === 0) options = videoList;
   const filename = options[Math.floor(Math.random() * options.length)];
   if (!filename) return;
-  // Audio afspelen als bloemen.mp4 wordt afgespeeld
-  if (audioMap[filename]) {
-    if (currentAudio) {
-      currentAudio.pause();
-      currentAudio.currentTime = 0;
-    }
-    currentAudio = new Audio(audioMap[filename]);
-    currentAudio.currentTime = 0;
-    currentAudio.volume = 1.0;
-    currentAudio.play().catch(e => { console.warn('Audio play error:', e); });
-  } else if (currentAudio) {
-    currentAudio.pause();
-    currentAudio.currentTime = 0;
-    currentAudio = null;
+  // Alleen audio op het middelste scherm
+  if (screenPart === 'center' && audioMap[filename]) {
+    crossfadeAudio(audioMap[filename]);
+  } else if (screenPart === 'center') {
+    crossfadeAudio(null);
   }
   const nextVideo = showingA ? videoB : videoA;
   const prevVideo = showingA ? videoA : videoB;
@@ -278,22 +278,53 @@ function crossfadeAudio(newSrc) {
 
 // --- WELCOME overlay ---
 function showWelcomeOverlay() {
+  if (screenPart !== 'center') return; // Alleen tonen op het middelste scherm
   let overlay = document.getElementById('welcomeOverlay');
   if (!overlay) {
     overlay = document.createElement('div');
     overlay.id = 'welcomeOverlay';
-    overlay.style.flexDirection = 'column'; // Zorgt dat tekst onder elkaar staat
+    overlay.style.position = 'fixed';
+    overlay.style.top = '0';
+    overlay.style.left = '0';
+    overlay.style.width = '100vw';
+    overlay.style.height = '100vh';
+    overlay.style.background = 'rgba(0,0,0,1)';
+    overlay.style.display = 'flex';
+    overlay.style.justifyContent = 'center';
+    overlay.style.alignItems = 'center';
+    overlay.style.zIndex = '9999';
+    overlay.style.transition = 'opacity 1s';
+    overlay.style.opacity = '1';
+    // Container voor tekst in het middenste derde deel
+    let textContainer = document.createElement('div');
+    textContainer.style.width = '100%';
+    textContainer.style.height = '100vh';
+    textContainer.style.display = 'flex';
+    textContainer.style.flexDirection = 'column';
+    textContainer.style.justifyContent = 'center';
+    textContainer.style.alignItems = 'center';
+    textContainer.style.position = 'absolute';
+    textContainer.style.left = '33.33vw';
+    textContainer.style.top = '0';
+    textContainer.style.width = '33.34vw';
     let text = document.createElement('span');
     text.textContent = 'WELCOME';
     text.className = 'welcome-title';
-    overlay.appendChild(text);
-    // Extra regel onder welcome
+    text.style.fontSize = 'clamp(2rem, 6vw, 8vw)';
+    text.style.wordBreak = 'break-word';
+    text.style.textAlign = 'center';
+    text.style.maxWidth = '100%';
+    textContainer.appendChild(text);
     let subtext = document.createElement('span');
     subtext.textContent = 'Stand on the colored dot';
     subtext.className = 'welcome-subtext';
-    overlay.appendChild(subtext);
+    subtext.style.fontSize = 'clamp(1.2rem, 3vw, 4vw)';
+    subtext.style.wordBreak = 'break-word';
+    subtext.style.textAlign = 'center';
+    subtext.style.maxWidth = '100%';
+    textContainer.appendChild(subtext);
+    overlay.appendChild(textContainer);
     document.body.appendChild(overlay);
-    // Na 7.5 seconden tekst verandert met fade-out/fade-in effect
     setTimeout(() => {
       text.style.transition = 'opacity 0.7s';
       subtext.style.transition = 'opacity 0.7s';
@@ -303,6 +334,10 @@ function showWelcomeOverlay() {
         text.textContent = 'Change your facial expression and explore';
         text.className = 'welcome-subtext';
         text.style.textAlign = 'center';
+        text.style.fontSize = 'clamp(1.2rem, 3vw, 4vw)';
+        text.style.wordBreak = 'break-word';
+        text.style.textAlign = 'center';
+        text.style.maxWidth = '100%';
         subtext.textContent = '';
         text.style.opacity = '1';
         subtext.style.opacity = '1';
@@ -313,8 +348,8 @@ function showWelcomeOverlay() {
     overlay.style.opacity = '1';
   }
   setTimeout(() => {
-    overlay.style.opacity = '0';
-    setTimeout(() => { overlay.style.display = 'none'; }, 1000);
+    if (overlay) overlay.style.opacity = '0';
+    setTimeout(() => { if (overlay) overlay.style.display = 'none'; }, 1000);
   }, 15000); // 15 seconden
 }
 
