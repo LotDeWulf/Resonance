@@ -154,15 +154,6 @@ let fadeIntervalTime = 30; // snellere interval voor smoothness
 videoA.classList.add('show');
 videoB.classList.add('hide');
 
-// Haal de 'screen' parameter uit de URL (left, center, right)
-function getScreenPart() {
-  const params = new URLSearchParams(window.location.search);
-  const part = params.get('screen');
-  if (['left','center','right'].includes(part)) return part;
-  return 'center'; // default
-}
-const screenPart = getScreenPart();
-
 socket.on('emotion', function(data) {
   const rawEmotion = data.emotion;
   const emotion = deepfaceToKey[rawEmotion];
@@ -173,10 +164,10 @@ socket.on('emotion', function(data) {
   if (options.length === 0) options = videoList;
   const filename = options[Math.floor(Math.random() * options.length)];
   if (!filename) return;
-  // Alleen audio op het middelste scherm
-  if (screenPart === 'center' && audioMap[filename]) {
+  // Audio altijd afspelen (alleen HIER, niet in oncanplay)
+  if (audioMap[filename]) {
     crossfadeAudio(audioMap[filename]);
-  } else if (screenPart === 'center') {
+  } else {
     crossfadeAudio(null);
   }
   const nextVideo = showingA ? videoB : videoA;
@@ -197,12 +188,7 @@ socket.on('emotion', function(data) {
     nextVideo.play();
     nextVideo.playbackRate = 1.0; // Zet op normale snelheid
     prevVideo.playbackRate = 1.0; // Zet op normale snelheid
-    // Audio crossfaden tegelijk met video
-    if (audioMap[filename]) {
-      crossfadeAudio(audioMap[filename]);
-    } else {
-      crossfadeAudio(null);
-    }
+    // Audio crossfaden NIET meer hier aanroepen!
     // Na de transition de oude video verbergen
     setTimeout(() => {
       prevVideo.classList.remove('show');
@@ -278,7 +264,6 @@ function crossfadeAudio(newSrc) {
 
 // --- WELCOME overlay ---
 function showWelcomeOverlay() {
-  if (screenPart !== 'center') return; // Alleen tonen op het middelste scherm
   let overlay = document.getElementById('welcomeOverlay');
   if (!overlay) {
     overlay = document.createElement('div');
@@ -295,18 +280,17 @@ function showWelcomeOverlay() {
     overlay.style.zIndex = '9999';
     overlay.style.transition = 'opacity 1s';
     overlay.style.opacity = '1';
-    // Container voor tekst in het middenste derde deel
+    // Container voor tekst in het midden van het scherm
     let textContainer = document.createElement('div');
-    textContainer.style.width = '100%';
+    textContainer.style.width = '100vw';
     textContainer.style.height = '100vh';
     textContainer.style.display = 'flex';
     textContainer.style.flexDirection = 'column';
     textContainer.style.justifyContent = 'center';
     textContainer.style.alignItems = 'center';
     textContainer.style.position = 'absolute';
-    textContainer.style.left = '33.33vw';
+    textContainer.style.left = '0';
     textContainer.style.top = '0';
-    textContainer.style.width = '33.34vw';
     let text = document.createElement('span');
     text.textContent = 'WELCOME';
     text.className = 'welcome-title';
