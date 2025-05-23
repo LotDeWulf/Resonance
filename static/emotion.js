@@ -338,3 +338,72 @@ function showWelcomeOverlay() {
 showWelcomeOverlay();
 // Herhaal elke 15 minuten
 setInterval(showWelcomeOverlay, 15 * 60 * 1000);
+
+// Voeg een fullscreen-knop toe
+function addFullscreenButton() {
+  let btn = document.createElement('button');
+  btn.textContent = '⛶';
+  btn.title = 'Fullscreen';
+  btn.id = 'fullscreenBtn';
+  btn.style.position = 'fixed';
+  btn.style.top = '20px';
+  btn.style.right = '20px';
+  btn.style.zIndex = '10000';
+  btn.style.fontSize = '2rem';
+  btn.style.background = 'rgba(0,0,0,0.5)';
+  btn.style.color = 'white';
+  btn.style.border = 'none';
+  btn.style.borderRadius = '8px';
+  btn.style.padding = '8px 16px';
+  btn.style.cursor = 'pointer';
+  btn.style.transition = 'background 0.2s, opacity 0.5s';
+  btn.style.opacity = '1';
+  btn.onmouseenter = () => btn.style.background = 'rgba(0,0,0,0.8)';
+  btn.onmouseleave = () => btn.style.background = 'rgba(0,0,0,0.5)';
+
+  let hideTimeout = null;
+
+  function showBtn() {
+    btn.style.opacity = '1';
+    btn.style.pointerEvents = 'auto';
+    if (hideTimeout) clearTimeout(hideTimeout);
+    if (document.fullscreenElement) {
+      hideTimeout = setTimeout(() => {
+        btn.style.opacity = '0';
+        btn.style.pointerEvents = 'none';
+      }, 2000);
+    }
+  }
+
+  function hideBtn() {
+    btn.style.opacity = '0';
+    btn.style.pointerEvents = 'none';
+  }
+
+  btn.onclick = () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen();
+    } else {
+      document.exitFullscreen();
+    }
+  };
+
+  document.body.appendChild(btn);
+
+  // Hide button when entering fullscreen (after click)
+  document.addEventListener('fullscreenchange', () => {
+    if (document.fullscreenElement) {
+      hideBtn();
+    } else {
+      showBtn();
+    }
+  });
+
+  // Show button on mousemove in fullscreen, then auto-hide
+  document.addEventListener('mousemove', () => {
+    if (document.fullscreenElement) {
+      showBtn();
+    }
+  });
+}
+addFullscreenButton();
