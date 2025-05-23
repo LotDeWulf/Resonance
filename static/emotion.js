@@ -120,15 +120,22 @@ const emotionToVideos = {
 };
 
 const audioMap = {
-  'bloemen.mp4': '/static/Audio/bloemen.wav',
+  'bloemen.mp4': '/static/Audio/Bloemenwav.wav',
+  'water.mp4': '/static/Audio/Waterwav.wav',
+  'wolken.mp4': '/static/Audio/Wolkenwav.wav',
   'waves.mp4': '/static/Audio/golven.wav',
+  'vuur.mp4': '/static/Audio/Vuurwav.wav',
   'lava.mp4': '/static/Audio/lava.wav',
-  'mist.mp4': '/static/Audio/mist.wav',
-  'regen.mp4': '/static/Audio/regen.wav',
+  'kwal.mp4': 'static/Audio/Kwalwav.wav',
+  'storm.mp4': 'static/Audio/Stormwav.wav',
+  'thunder.mp4': 'static/Audio/Donderwav.wav',
+  'mist.mp4': '/static/Audio/Mistwav.wav',
+  'regen.mp4': '/static/Audio/Regenwav.wav',
   'regen 2.mp4': '/static/Audio/regenBW.wav',
-  'vuur.mp4': '/static/Audio/vuur.wav',
-  'water.mp4': '/static/Audio/Water.wav',
-  'wolken.mp4': '/static/Audio/wolken.wav',
+  'zwart_gat.mp4': 'static/Audio/Surprise [Black-Hole - Light-Star-Zoom - Group-Of-Jellyfish].wav',
+  'stars.mp4': 'static/Audio/Surprise [Black-Hole - Light-Star-Zoom - Group-Of-Jellyfish].wav',
+  'kwallen.mp4': 'static/Audio/Surprise [Black-Hole - Light-Star-Zoom - Group-Of-Jellyfish].wav',
+
   // Voeg hier eventueel meer mappings toe
 };
 
