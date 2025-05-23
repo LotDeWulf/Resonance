@@ -145,6 +145,9 @@ let showingA = true;
 let lastEmotion = null;
 let lastFilename = null;
 let currentAudio = null;
+let fadeInterval = null;
+let fadeStep = 0.01; // kleinere stap voor smoothness
+let fadeIntervalTime = 30; // snellere interval voor smoothness
 
 
 // Init: videoA zichtbaar, videoB onzichtbaar
@@ -194,6 +197,12 @@ socket.on('emotion', function(data) {
     nextVideo.play();
     nextVideo.playbackRate = 1.0; // Zet op normale snelheid
     prevVideo.playbackRate = 1.0; // Zet op normale snelheid
+    // Audio crossfaden tegelijk met video
+    if (audioMap[filename]) {
+      crossfadeAudio(audioMap[filename]);
+    } else {
+      crossfadeAudio(null);
+    }
     // Na de transition de oude video verbergen
     setTimeout(() => {
       prevVideo.classList.remove('show');
@@ -205,6 +214,67 @@ socket.on('emotion', function(data) {
     lastFilename = filename;
   };
 });
+
+let nextAudio = null;
+
+function crossfadeAudio(newSrc) {
+  if (!newSrc) {
+    // Geen nieuwe audio, fade huidige uit
+    if (currentAudio) {
+      let oldAudio = currentAudio;
+      if (fadeInterval) clearInterval(fadeInterval);
+      fadeInterval = setInterval(() => {
+        if (oldAudio.volume > fadeStep) {
+          oldAudio.volume = Math.max(0, oldAudio.volume - fadeStep);
+        } else {
+          oldAudio.volume = 0;
+          oldAudio.pause();
+          clearInterval(fadeInterval);
+        }
+      }, fadeIntervalTime);
+      currentAudio = null;
+    }
+    return;
+  }
+  if (currentAudio && currentAudio.src.endsWith(newSrc)) {
+    // Zelfde audio, niets doen
+    if (currentAudio.paused) currentAudio.play();
+    return;
+  }
+  // Start crossfade: beide audio's spelen tegelijk
+  if (fadeInterval) clearInterval(fadeInterval);
+  nextAudio = new Audio(newSrc);
+  nextAudio.volume = 0;
+  nextAudio.loop = true;
+  nextAudio.play().then(() => {
+    let localCurrent = currentAudio;
+    let localNext = nextAudio;
+    // Beide audio's spelen tegelijk, volumes schuiven over elkaar
+    fadeInterval = setInterval(() => {
+      if (localNext.volume < 0.99) {
+        localNext.volume = Math.min(1.0, localNext.volume + fadeStep);
+      }
+      if (localCurrent) {
+        if (localCurrent.volume > fadeStep) {
+          localCurrent.volume = Math.max(0, localCurrent.volume - fadeStep);
+        } else {
+          localCurrent.volume = 0;
+          localCurrent.pause();
+          localCurrent = null;
+        }
+      }
+      if ((!localCurrent || (localCurrent.volume === 0)) && localNext.volume >= 1.0) {
+        clearInterval(fadeInterval);
+        fadeInterval = null;
+      }
+    }, fadeIntervalTime);
+    currentAudio = localNext;
+    nextAudio = null;
+  }).catch(e => {
+    console.warn('Audio play error:', e);
+    if (fadeInterval) clearInterval(fadeInterval);
+  });
+}
 
 // --- WELCOME overlay ---
 function showWelcomeOverlay() {
