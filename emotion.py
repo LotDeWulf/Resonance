@@ -49,7 +49,7 @@ def detect_emotion():
             if mapped in ["angry", "fear"]:
                 consecutive_trigger += 1
                 print(f"Consecutive trigger count: {consecutive_trigger}", flush=True)  # <-- Debug log voor de counter
-                if consecutive_trigger == 3:
+                if consecutive_trigger == 4:
                     print("Three consecutive trigger emotions detected. Starting breathing exercise.") # <-- Debug log voor de trigger
                     socketio.emit('breathing_exercise', {'start': True})
                     consecutive_trigger = 0  # Reset de counter na het triggeren
