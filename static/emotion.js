@@ -120,21 +120,22 @@ const emotionToVideos = {
 };
 
 const audioMap = {
-  'bloemen.mp4': '/static/Audio/Bloemen.mp4',
-  'water.mp4': '/static/Audio/Water.mp4',
-  'wolken.mp4': '/static/Audio/Wolken.mp4',
+  'bloemen.mp4': '/static/Audio/Bloemenwav.wav',
+  'water.mp4': '/static/Audio/Waterwav.wav',
+  'wolken.mp4': '/static/Audio/Wolkenwav.wav',
   'waves.mp4': '/static/Audio/golven.wav',
-  'vuur.mp4': '/static/Audio/Vuur.mp4',
+  'vuur.mp4': '/static/Audio/Vuurwav.wav',
   'lava.mp4': '/static/Audio/lava.wav',
-  'kwal.mp4': '/static/Audio/Kwal.mp4',
-  'storm.mp4': '/static/Audio/Storm.mp4',
-  'thunder.mp4': '/static/Audio/Donder.mp4',
-  'mist.mp4': '/static/Audio/Mist.mp4',
-  'regen.mp4': '/static/Audio/Regen.mp4',
+  'kwal.mp4': 'static/Audio/Kwalwav.wav',
+  'storm.mp4': 'static/Audio/Stormwav.wav',
+  'thunder.mp4': 'static/Audio/Donderwav.wav',
+  'mist.mp4': '/static/Audio/Mistwav.wav',
+  'regen.mp4': '/static/Audio/Regenwav.wav',
   'regen 2.mp4': '/static/Audio/regenBW.wav',
   'zwart_gat.mp4': 'static/Audio/Surprise [Black-Hole - Light-Star-Zoom - Group-Of-Jellyfish].wav',
   'stars.mp4': 'static/Audio/Surprise [Black-Hole - Light-Star-Zoom - Group-Of-Jellyfish].wav',
   'kwallen.mp4': 'static/Audio/Surprise [Black-Hole - Light-Star-Zoom - Group-Of-Jellyfish].wav',
+
   // Voeg hier eventueel meer mappings toe
 };
 
@@ -144,9 +145,9 @@ let showingA = true;
 let lastEmotion = null;
 let lastFilename = null;
 let currentAudio = null;
-let lastVideoSwitch = 0; // timestamp van laatste video-wissel
-let fadeDuration = 1500; // duur van crossfade in ms (1.5s)
-let fadeDelay = 500; // nieuwe audio fade-in start na 0.5s
+let fadeInterval = null;
+let fadeStep = 0.01; // kleinere stap voor smoothness
+let fadeIntervalTime = 30; // snellere interval voor smoothness
 
 
 // Init: videoA zichtbaar, videoB onzichtbaar
@@ -167,51 +168,11 @@ socket.on('emotion', function(data) {
   if (options.length === 0) options = videoList;
   const filename = options[Math.floor(Math.random() * options.length)];
   if (!filename) return;
-  // --- Crossfade audio ---
+  // Audio altijd afspelen (alleen HIER, niet in oncanplay)
   if (audioMap[filename]) {
-    let newAudio = new Audio(audioMap[filename]);
-    newAudio.addEventListener('loadedmetadata', function() {
-      if (newAudio.duration && isFinite(newAudio.duration)) {
-        let maxStart = Math.max(0, newAudio.duration * 0.9);
-        newAudio.currentTime = Math.random() * maxStart;
-      }
-    });
-    newAudio.volume = 0;
-    newAudio.play().then(() => {
-      // Fade out oude audio
-      if (currentAudio) {
-        let oldAudio = currentAudio;
-        let fadeOutStart = Date.now();
-        function fadeOut() {
-          let elapsed = Date.now() - fadeOutStart;
-          let vol = Math.max(0, 1 - (elapsed / fadeDuration));
-          oldAudio.volume = vol;
-          if (vol > 0) {
-            requestAnimationFrame(fadeOut);
-          } else {
-            oldAudio.pause();
-            oldAudio.currentTime = 0;
-          }
-        }
-        fadeOut();
-      }
-      // Fade in nieuwe audio na fadeDelay
-      setTimeout(() => {
-        let fadeInStart = Date.now();
-        function fadeIn() {
-          let elapsed = Date.now() - fadeInStart;
-          let vol = Math.min(1, elapsed / fadeDuration);
-          newAudio.volume = vol;
-          if (vol < 1) requestAnimationFrame(fadeIn);
-        }
-        fadeIn();
-      }, fadeDelay);
-    }).catch(e => { console.warn('Audio play error:', e); });
-    currentAudio = newAudio;
-  } else if (currentAudio) {
-    currentAudio.pause();
-    currentAudio.currentTime = 0;
-    currentAudio = null;
+    crossfadeAudio(audioMap[filename]);
+  } else {
+    crossfadeAudio(null);
   }
   const nextVideo = showingA ? videoB : videoA;
   const prevVideo = showingA ? videoA : videoB;
@@ -231,6 +192,7 @@ socket.on('emotion', function(data) {
     nextVideo.play();
     nextVideo.playbackRate = 1.0; // Zet op normale snelheid
     prevVideo.playbackRate = 1.0; // Zet op normale snelheid
+    // Audio crossfaden NIET meer hier aanroepen!
     // Na de transition de oude video verbergen
     setTimeout(() => {
       prevVideo.classList.remove('show');
@@ -243,24 +205,117 @@ socket.on('emotion', function(data) {
   };
 });
 
+let nextAudio = null;
+
+function crossfadeAudio(newSrc) {
+  if (!newSrc) {
+    // Geen nieuwe audio, fade huidige uit
+    if (currentAudio) {
+      let oldAudio = currentAudio;
+      if (fadeInterval) clearInterval(fadeInterval);
+      fadeInterval = setInterval(() => {
+        if (oldAudio.volume > fadeStep) {
+          oldAudio.volume = Math.max(0, oldAudio.volume - fadeStep);
+        } else {
+          oldAudio.volume = 0;
+          oldAudio.pause();
+          oldAudio.currentTime = 0;
+          clearInterval(fadeInterval);
+        }
+      }, fadeIntervalTime);
+      currentAudio = null;
+    }
+    return;
+  }
+  // Vergelijk altijd absolute paden
+  const absNewSrc = new URL(newSrc, window.location.origin).href;
+  if (currentAudio && currentAudio.src === absNewSrc) {
+    if (currentAudio.paused) currentAudio.play();
+    return;
+  }
+  if (fadeInterval) clearInterval(fadeInterval);
+  let oldAudio = currentAudio;
+  let nextAudio = new Audio(newSrc);
+  nextAudio.volume = 0;
+  nextAudio.loop = true;
+  nextAudio.addEventListener('loadedmetadata', function startRandom() {
+    if (nextAudio.duration && isFinite(nextAudio.duration)) {
+      nextAudio.currentTime = Math.random() * nextAudio.duration;
+    }
+    nextAudio.play().then(() => {
+      fadeInterval = setInterval(() => {
+        if (nextAudio.volume < 0.99) {
+          nextAudio.volume = Math.min(1.0, nextAudio.volume + fadeStep);
+        }
+        if (oldAudio) {
+          if (oldAudio.volume > fadeStep) {
+            oldAudio.volume = Math.max(0, oldAudio.volume - fadeStep);
+          } else {
+            oldAudio.volume = 0;
+            oldAudio.pause();
+            oldAudio.currentTime = 0;
+            oldAudio = null;
+          }
+        }
+        if ((!oldAudio || oldAudio.volume === 0) && nextAudio.volume >= 1.0) {
+          clearInterval(fadeInterval);
+          fadeInterval = null;
+        }
+      }, fadeIntervalTime);
+      currentAudio = nextAudio;
+    }).catch(e => {
+      console.warn('Audio play error:', e);
+      if (fadeInterval) clearInterval(fadeInterval);
+      fadeInterval = null;
+    });
+    nextAudio.removeEventListener('loadedmetadata', startRandom);
+  });
+}
+
 // --- WELCOME overlay ---
 function showWelcomeOverlay() {
   let overlay = document.getElementById('welcomeOverlay');
   if (!overlay) {
     overlay = document.createElement('div');
     overlay.id = 'welcomeOverlay';
-    overlay.style.flexDirection = 'column'; // Zorgt dat tekst onder elkaar staat
+    overlay.style.position = 'fixed';
+    overlay.style.top = '0';
+    overlay.style.left = '0';
+    overlay.style.width = '100vw';
+    overlay.style.height = '100vh';
+    overlay.style.background = 'rgba(0,0,0,1)';
+    overlay.style.display = 'flex';
+    overlay.style.justifyContent = 'center';
+    overlay.style.alignItems = 'center';
+    overlay.style.zIndex = '9999';
+    overlay.style.transition = 'opacity 1s';
+    overlay.style.opacity = '1';
+    // Container voor tekst in het middenste derde deel van het scherm
+    let textContainer = document.createElement('div');
+    textContainer.style.position = 'absolute';
+    textContainer.style.left = '33.33vw';
+    textContainer.style.top = '0';
+    textContainer.style.width = '33.34vw';
+    textContainer.style.height = '100vh';
+    textContainer.style.display = 'flex';
+    textContainer.style.flexDirection = 'column';
+    textContainer.style.justifyContent = 'center';
+    textContainer.style.alignItems = 'center';
+    textContainer.style.wordBreak = 'break-word';
+    textContainer.style.textAlign = 'center';
+    textContainer.style.maxWidth = '100%';
     let text = document.createElement('span');
     text.textContent = 'WELCOME';
     text.className = 'welcome-title';
-    overlay.appendChild(text);
-    // Extra regel onder welcome
+    text.style.fontSize = 'clamp(2rem, 6vw, 8vw)';
+    textContainer.appendChild(text);
     let subtext = document.createElement('span');
     subtext.textContent = 'Stand on the colored dot';
     subtext.className = 'welcome-subtext';
-    overlay.appendChild(subtext);
+    subtext.style.fontSize = 'clamp(1.2rem, 3vw, 4vw)';
+    textContainer.appendChild(subtext);
+    overlay.appendChild(textContainer);
     document.body.appendChild(overlay);
-    // Na 7.5 seconden tekst verandert met fade-out/fade-in effect
     setTimeout(() => {
       text.style.transition = 'opacity 0.7s';
       subtext.style.transition = 'opacity 0.7s';
@@ -270,6 +325,10 @@ function showWelcomeOverlay() {
         text.textContent = 'Change your facial expression and explore';
         text.className = 'welcome-subtext';
         text.style.textAlign = 'center';
+        text.style.fontSize = 'clamp(1.2rem, 3vw, 4vw)';
+        text.style.wordBreak = 'break-word';
+        text.style.textAlign = 'center';
+        text.style.maxWidth = '100%';
         subtext.textContent = '';
         text.style.opacity = '1';
         subtext.style.opacity = '1';
@@ -280,8 +339,8 @@ function showWelcomeOverlay() {
     overlay.style.opacity = '1';
   }
   setTimeout(() => {
-    overlay.style.opacity = '0';
-    setTimeout(() => { overlay.style.display = 'none'; }, 1000);
+    if (overlay) overlay.style.opacity = '0';
+    setTimeout(() => { if (overlay) overlay.style.display = 'none'; }, 1000);
   }, 15000); // 15 seconden
 }
 
