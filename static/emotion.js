@@ -209,15 +209,15 @@ const audioMap = {
   'waves.mp4': '/static/Audio/golven.wav',
   'vuur.mp4': '/static/Audio/Vuurwav.wav',
   'lava.mp4': '/static/Audio/lava.wav',
-  'kwal.mp4': 'static/Audio/Kwalwav.wav',
-  'storm.mp4': 'static/Audio/Stormwav.wav',
-  'thunder.mp4': 'static/Audio/Donderwav.wav',
+  'kwal.mp4': '/static/Audio/Kwalwav.wav',
+  'storm.mp4': '/static/Audio/Stormwav.wav',
+  'thunder.mp4': '/static/Audio/Donderwav.wav',
   'mist.mp4': '/static/Audio/Mistwav.wav',
   'regen.mp4': '/static/Audio/Regenwav.wav',
   'regen 2.mp4': '/static/Audio/regenBW.wav',
-  'zwart_gat.mp4': 'static/Audio/Surprise [Black-Hole - Light-Star-Zoom - Group-Of-Jellyfish].wav',
-  'stars.mp4': 'static/Audio/Surprise [Black-Hole - Light-Star-Zoom - Group-Of-Jellyfish].wav',
-  'kwallen.mp4': 'static/Audio/Surprise [Black-Hole - Light-Star-Zoom - Group-Of-Jellyfish].wav',
+  'zwart_gat.mp4': '/static/Audio/Surprise [Black-Hole - Light-Star-Zoom - Group-Of-Jellyfish].wav',
+  'stars.mp4': '/static/Audio/Surprise [Black-Hole - Light-Star-Zoom - Group-Of-Jellyfish].wav',
+  'kwallen.mp4': '/static/Audio/Surprise [Black-Hole - Light-Star-Zoom - Group-Of-Jellyfish].wav',
 
   // Voeg hier eventueel meer mappings toe
 };
@@ -232,68 +232,61 @@ let currentAudio = null;
 let fadeInterval = null;
 let fadeStep = 0.01; // kleinere stap voor smoothness
 let fadeIntervalTime = 30; // snellere interval voor smoothness
+let currentSwitchToken = 0; // Token om sync te garanderen
 
 
 // Init: videoA zichtbaar, videoB onzichtbaar
 videoA.classList.add('show');
 videoB.classList.add('hide');
 
-socket.on('emotion', function(data) {
-  const now = Date.now();
-  if (now - lastVideoSwitch < 10000) return; // 10 seconden wachten tussen wissels
-  lastVideoSwitch = now;
-  
-  const rawEmotion = data.emotion;
-  const emotion = deepfaceToKey[rawEmotion];
-  const videoList = emotionToVideos[emotion];
-  if (!videoList) return;
-  // Kies random video uit de lijst, voorkom herhaling van dezelfde video
-  let options = videoList.filter(v => v !== lastFilename);
-  if (options.length === 0) options = videoList;
-  const filename = options[Math.floor(Math.random() * options.length)];
-  if (!filename) return;
-  // Audio altijd afspelen (alleen HIER, niet in oncanplay)
-  if (audioMap[filename]) {
-    crossfadeAudio(audioMap[filename]);
-  } else {
-    crossfadeAudio(null);
-  }
+// --- VIDEO CROSSFADE LOGICA ---
+function crossfadeVideo(nextFilename, switchToken) {
   const nextVideo = showingA ? videoB : videoA;
   const prevVideo = showingA ? videoA : videoB;
-  nextVideo.src = `/static/videos/${filename}?t=${Date.now()}`;
+  nextVideo.src = `/static/videos/${nextFilename}?t=${Date.now()}`;
+  nextVideo.style.transition = 'none';
+  nextVideo.style.opacity = 0;
+  nextVideo.classList.add('show');
+  nextVideo.classList.remove('hide');
+  prevVideo.classList.add('show');
+  prevVideo.classList.remove('hide');
   nextVideo.load();
   nextVideo.oncanplay = () => {
-    // Beide zichtbaar maken voor crossfade
-    nextVideo.classList.add('show');
-    nextVideo.classList.remove('hide');
-    prevVideo.classList.add('show');
-    prevVideo.classList.remove('hide');
+    // Controleer of dit nog de laatste switch is
+    if (switchToken !== currentSwitchToken) return;
     // Forceer reflow zodat de transition werkt
     void nextVideo.offsetWidth;
-    // Fade in/out
+    // Fade in/out met gelijke tijd en curve
+    nextVideo.style.transition = 'opacity 2.5s cubic-bezier(0.77, 0, 0.175, 1)';
+    prevVideo.style.transition = 'opacity 2.5s cubic-bezier(0.77, 0, 0.175, 1)';
     nextVideo.style.opacity = 1;
-    prevVideo.style.opacity = 0;
+    prevVideo.style.opacity = 0.7; // eerst naar 0.7 voor zachtere overlap
+    setTimeout(() => {
+      prevVideo.style.opacity = 0;
+    }, 1200); // na 1.2s verder uitfaden
     nextVideo.play();
-    nextVideo.playbackRate = 1.0; // Zet op normale snelheid
-    prevVideo.playbackRate = 1.0; // Zet op normale snelheid
-    // Audio crossfaden NIET meer hier aanroepen!
-    // Na de transition de oude video verbergen
+    nextVideo.playbackRate = 1.0;
+    prevVideo.playbackRate = 1.0;
     setTimeout(() => {
       prevVideo.classList.remove('show');
       prevVideo.classList.add('hide');
       prevVideo.style.opacity = '';
       nextVideo.style.opacity = '';
-    }, 5000); // pas evt. aan als je crossfade tijd wijzigt
+    }, 2500); // fade tijd
     showingA = !showingA;
-    lastFilename = filename;
+    lastFilename = nextFilename;
   };
-});
+}
 
-let nextAudio = null;
+// --- AUDIO KOPPELING EN CROSSFADE ---
+function getAudioForVideo(filename) {
+  // Normalizeer bestandsnaam (hoofdletters, spaties)
+  const key = Object.keys(audioMap).find(k => k.replace(/\s+/g, '').toLowerCase() === filename.replace(/\s+/g, '').toLowerCase());
+  return key ? audioMap[key] : null;
+}
 
-function crossfadeAudio(newSrc) {
+function crossfadeAudio(newSrc, switchToken) {
   if (!newSrc) {
-    // Geen nieuwe audio, fade huidige uit
     if (currentAudio) {
       let oldAudio = currentAudio;
       if (fadeInterval) clearInterval(fadeInterval);
@@ -311,7 +304,6 @@ function crossfadeAudio(newSrc) {
     }
     return;
   }
-  // Vergelijk altijd absolute paden
   const absNewSrc = new URL(newSrc, window.location.origin).href;
   if (currentAudio && currentAudio.src === absNewSrc) {
     if (currentAudio.paused) currentAudio.play();
@@ -322,12 +314,21 @@ function crossfadeAudio(newSrc) {
   let nextAudio = new Audio(newSrc);
   nextAudio.volume = 0;
   nextAudio.loop = true;
-  nextAudio.addEventListener('loadedmetadata', function startRandom() {
+
+  // Helper om altijd random te starten, ook bij cache
+  function setRandomStartAndPlay() {
     if (nextAudio.duration && isFinite(nextAudio.duration)) {
       nextAudio.currentTime = Math.random() * nextAudio.duration;
     }
     nextAudio.play().then(() => {
       fadeInterval = setInterval(() => {
+        // Controleer of dit nog de laatste switch is
+        if (switchToken !== currentSwitchToken) {
+          nextAudio.pause();
+          nextAudio.currentTime = 0;
+          clearInterval(fadeInterval);
+          return;
+        }
         if (nextAudio.volume < 0.99) {
           nextAudio.volume = Math.min(1.0, nextAudio.volume + fadeStep);
         }
@@ -352,9 +353,45 @@ function crossfadeAudio(newSrc) {
       if (fadeInterval) clearInterval(fadeInterval);
       fadeInterval = null;
     });
-    nextAudio.removeEventListener('loadedmetadata', startRandom);
-  });
+  }
+
+  // Altijd random start, ook bij cache
+  if (nextAudio.readyState >= 1) {
+    setRandomStartAndPlay();
+  } else {
+    nextAudio.addEventListener('loadedmetadata', function handler() {
+      setRandomStartAndPlay();
+      nextAudio.removeEventListener('loadedmetadata', handler);
+    });
+  }
 }
+
+// --- EMOTIE EVENT HANDLER ---
+socket.on('emotion', function(data) {
+  const now = Date.now();
+  if (now - lastVideoSwitch < 10000) return; // 10 seconden wachten tussen wissels
+  lastVideoSwitch = now;
+  currentSwitchToken++;
+  const switchToken = currentSwitchToken;
+  const rawEmotion = data.emotion;
+  const emotion = deepfaceToKey[rawEmotion];
+  const videoList = emotionToVideos[emotion];
+  if (!videoList) return;
+  // Kies random video uit de lijst, voorkom herhaling van dezelfde video
+  let options = videoList.filter(v => v !== lastFilename);
+  if (options.length === 0) options = videoList;
+  const filename = options[Math.floor(Math.random() * options.length)];
+  if (!filename) return;
+  // Video crossfade
+  crossfadeVideo(filename, switchToken);
+  // Audio crossfade met juiste mapping
+  const audioSrc = getAudioForVideo(filename);
+  if (audioSrc) {
+    crossfadeAudio(audioSrc, switchToken);
+  } else {
+    crossfadeAudio(null, switchToken);
+  }
+});
 
 // --- WELCOME overlay ---
 function showWelcomeOverlay() {
@@ -412,7 +449,7 @@ function showWelcomeOverlay() {
     textContainer.appendChild(text);
 
     let subtext = document.createElement('span');
-    subtext.textContent = 'Stand on the colored dot';
+    subtext.textContent = 'Sit on the colored dot';
     subtext.className = 'welcome-subtext';
     subtext.style.fontSize = 'clamp(1.2rem, 3vw, 4vw)';
     textContainer.appendChild(subtext);
