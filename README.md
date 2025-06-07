@@ -643,6 +643,26 @@ setInterval(showWelcomeOverlay, 15 * 60 * 1000);
 
 #### // --- END OF WELCOME OVERLAY --- //
 
+### 6. Place other assets
+
+-	Place any video files (e.g., your welcome video and videos per emotion) in videos.
+-	Place audio files in Audio.
+-	Add fonts or CSS in static/css/ if needed.
+
+#### If you want to upload this project to GitHub, you will need to make the static folder invisible in a .gitignore folder like this:
+
+static/Audio/
+static/videos/
+
+7. Run the application
+And lastly, with your virtual environment activated, run the server:
+
+python emotion.py
+
+
+
+
+
 
 
 
