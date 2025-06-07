@@ -27,11 +27,45 @@ To make this project come to life we used the ["Facial-Emotion-Recognition-using
 
 ## Step 3: visuals
 ### Visuals anger
-- Now we look for images to go with the emotions we want to portray, starting with anger.
+- Now we look for short video's to go with the emotions we want to portray, starting with anger. We searched for 3 video's per emotion. Be sure to use copyright free video's. 
 
 <img width="200" alt="FWYKADDMAJNZUMS" src="https://github.com/user-attachments/assets/fd24957b-6e09-4ddd-b0bc-e2c74b3fef7b" />
 <img width="200" alt="FMRO91KMAJNZUN2" src="https://github.com/user-attachments/assets/02501123-9591-4679-8e88-74605eeae706" />
 <img width="200" alt="FE57SQMMAJNZUND" src="https://github.com/user-attachments/assets/1ee348f5-4e18-47e0-ad15-140ed63dd853" />
+
+### Visuals sadness
+
+<img width="200" alt="FCUAN42MAJNZUOF" src="https://github.com/user-attachments/assets/704d770d-c5b7-478a-95e8-72c059a9a80d" />
+<img width="200" alt="FW38AOOMAJNZUOU" src="https://github.com/user-attachments/assets/6677f795-65d0-4caf-b6f7-69a19bda6d1e" />
+<img width="200" alt="FMLTA7PMAJNZUPA" src="https://github.com/user-attachments/assets/8b25eeff-1cd8-49b3-bd88-be3205a27217" />
+
+### Visuals amazement
+
+<img width="200" alt="FMRBRMCMAJNZURP" src="https://github.com/user-attachments/assets/16f40447-d9dc-420c-afc4-3466f0b3d851" />
+<img width="200" alt="F5LVAHBMAJNZUS9" src="https://github.com/user-attachments/assets/25f2f4a6-7aa8-4583-b20f-e78ad98e0b16" />
+<img width="200" alt="F90N2IWMAJNZUSX" src="https://github.com/user-attachments/assets/94d4f420-7822-4750-a823-25e17516e08f" />
+
+### Visuals happiness
+
+<img width="200" alt="FFOCTWHMAJNZUVN" src="https://github.com/user-attachments/assets/1ade5cc5-f4ae-4ae9-a41f-8b9a75305481" />
+<img width="200" alt="FNT50UPMAJNZUWG" src="https://github.com/user-attachments/assets/7c20dc5b-7f74-49c1-8e15-6feb8395202a" />
+<img width="200" alt="FMUTRU8MAJNZUX6" src="https://github.com/user-attachments/assets/5384ce86-c4bc-4b13-8c25-d9aa189b6db8" />
+
+### Visuals fear
+
+<img width="200" alt="F9GW1MRMAJNZUZL" src="https://github.com/user-attachments/assets/bb84b27d-97ae-4a12-b6b2-c481bc8db1ab" />
+<img width="200" alt="F31EZA0MAJNZV0F" src="https://github.com/user-attachments/assets/1a2e1711-66c6-47d6-88be-82898a7ee68c" />
+<img width="200" alt="FLMNB1GMAJNZV1A" src="https://github.com/user-attachments/assets/878a642a-cb2a-4705-9598-c0b164fe09e7" />
+
+## Step 4: music
+- We forwarded the different images to the conservatoire students so that they could make different compositions for the different images. You can also just find music pieces online that you can put under the images.
+
+  ![FB67GE7MAJNZV6A](https://github.com/user-attachments/assets/ba1814ff-9229-49f6-8763-b76401dd937b)
+
+
+
+
+
 
 
 
