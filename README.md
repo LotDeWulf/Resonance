@@ -4,6 +4,22 @@ To make this project come to life we used the ["Facial-Emotion-Recognition-using
 - Give this repository a ⭐ if you liked it, we would appreciate it!
 - The Resonance team <3
 
+# Instructables
+
+## Supplies
+- beamers (we used 3 beamers)
+- camera
+- speaker
+- music (we used music by conservatoire students)
+
+## Step 1: sketch
+- The first thing to do is sketch. Make lots of rough sketches until you find something you want to move forward with.
+![FNZBQOHMAJNZU90](https://github.com/user-attachments/assets/19f98ee8-58d7-4e4d-a4c3-e36dc248bf5b)
+![FUC439LMAJNZU94](https://github.com/user-attachments/assets/a957d423-33cf-4f75-8d84-9639a9227438)
+![FLMENNNMAJNZU98](https://github.com/user-attachments/assets/bfe98118-6446-43d9-9d02-701a15623760)
+![F02NYOZMAJNZU9D](https://github.com/user-attachments/assets/6c91fc47-a9c3-4918-83e4-01b1004459bf)
+
+
 ## Dependencies
 
 - [deepface](https://github.com/serengil/deepface): A deep learning facial analysis library that provides pre-trained models for facial emotion detection. It relies on TensorFlow for the underlying deep learning operations.
