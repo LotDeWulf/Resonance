@@ -17,7 +17,6 @@ To make this project come to life we used the ["Facial-Emotion-Recognition-using
 -	Video files of your choice
 -	Audio files of your choice
 -	Touchdesigner
-![image](https://github.com/user-attachments/assets/cdaea181-8d2c-405c-ac6b-c7cb116e2cf0)
 
 
 ## Step 1: sketch
