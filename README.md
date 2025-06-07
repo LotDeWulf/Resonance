@@ -10,7 +10,7 @@ To make this project come to life we used the ["Facial-Emotion-Recognition-using
 - beamers (we used 3 beamers)
 - camera
 - speaker
-- music (we used music by conservatoire students)
+- music (we used music by conservatory students)
 - Visual Studio code or any other coding program working with HTML/CSS/JS/Python
 -	Python Version 3.12
 -	PowerShell, terminal or any other CLI app
