@@ -346,6 +346,7 @@ Section two: Video Transition Logic:
 ### // --- START VIDEO TRANSITION LOGIC SECTION --- //
 
 const deepfaceToKey = {
+
   happy: "happy",
   angry: "angry",
   fear: "fear",
@@ -353,28 +354,41 @@ const deepfaceToKey = {
   sad: "sad",
   surprise: "surprise",
   surprised: "surprise"
+  
 };
 
 const emotionToVideos = {
+
   happy: [ Insert your “happy” videos like: "happy1.wav", "happy2.wav”],
   angry: [Insert your “angry” videos here],
   fear: [Insert your “fear” videos here],
   sad: [Insert your “sad” videos here],
   surprise: [Insert your “surprise” videos here]
+
 };
 
 const videoA = document.getElementById('videoA');
+
 const videoB = document.getElementById('videoB');
+
 let showingA = true;
+
 let lastEmotion = null;
+
 let lastFilename = null;
+
 let lastVideoSwitch = 0;
+
 let currentSwitchToken = 0; // To ensure sync
 
+
 videoA.classList.add('show');
+
 videoB.classList.add('hide');
 
+
 function crossfadeVideo(nextFilename, switchToken) {
+
   const nextVideo = showingA ? videoB : videoA;
   const prevVideo = showingA ? videoA : videoB;
   nextVideo.src = `/static/videos/${nextFilename}?t=${Date.now()}`;
@@ -385,6 +399,8 @@ function crossfadeVideo(nextFilename, switchToken) {
   prevVideo.classList.add('show');
   prevVideo.classList.remove('hide');
   nextVideo.load();
+  
+  
   nextVideo.oncanplay = () => {
     // Check if this is still the latest switch
     if (switchToken !== currentSwitchToken) return;
@@ -393,11 +409,12 @@ void nextVideo.offsetWidth; // Force reflow for CSS transition
 #### Create a fade in/out using a timing and easing curve:
 
 nextVideo.style.transition = 'opacity 2.5s cubic-bezier(0.77, 0, 0.175, 1)';
-    prevVideo.style.transition = 'opacity 2.5s cubic-bezier(0.77, 0, 0.175, 1)';
-    nextVideo.style.opacity = 1;
-    prevVideo.style.opacity = 0.7; // initial softer overlap
-    setTimeout(() => {
-      prevVideo.style.opacity = 0;
+prevVideo.style.transition = 'opacity 2.5s cubic-bezier(0.77, 0, 0.175, 1)';
+nextVideo.style.opacity = 1;
+prevVideo.style.opacity = 0.7; // initial softer overlap
+setTimeout(() => {
+
+prevVideo.style.opacity = 0;
     }, 1200); // further fade out after 1.2 sec
     nextVideo.play();
     nextVideo.playbackRate = 1.0;
@@ -420,6 +437,7 @@ Section three: Audio Transition Logic:
 #### // --- START AUDIO TRANSITION LOGIC SECTION --- //
 
 const audioMap = {
+
   'flowers.mp4': '/static/Audio/flowers-audio.wav',
   'water.mp4': '/static/Audio/water-audio.wav',
   'clouds.mp4': '/static/Audio/clouds-audio.wav',
@@ -435,6 +453,7 @@ const audioMap = {
   'blackhole.mp4': '/static/Audio/blackhole-audio.wav',
   'stars.mp4': '/static/Audio/stars.wav',
   'jellyfish2.mp4': '/static/Audio/jellyfish2-audio.wav',
+  
 };
 
 let currentAudio = null;
@@ -443,14 +462,17 @@ let fadeStep = 0.01;        // Smaller step for smooth fading
 let fadeIntervalTime = 30;  // Faster interval in ms for smoothness
 
 function getAudioForVideo(filename) {
+
   // Normalize the name: remove spaces and lower case
   const key = Object.keys(audioMap).find(k =>
     k.replace(/\s+/g, '').toLowerCase() === filename.replace(/\s+/g, '').toLowerCase()
   );
   return key ? audioMap[key] : null;
+  
 }
 
 function crossfadeAudio(newSrc, switchToken) {
+  
   if (!newSrc) {
     if (currentAudio) {
       let oldAudio = currentAudio;
@@ -468,6 +490,7 @@ function crossfadeAudio(newSrc, switchToken) {
       currentAudio = null;
     }
     return;
+    
   }
   const absNewSrc = new URL(newSrc, window.location.origin).href;
   if (currentAudio && currentAudio.src === absNewSrc) {
