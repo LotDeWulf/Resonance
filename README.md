@@ -188,6 +188,440 @@ threading.Thread(target=detect_emotion, daemon=True).start()
 if __name__ == '__main__':
     socketio.run(app, host='0.0.0.0', port=5000)
 
+### 5. Write the client-side Code (emotion.js)
+Structure Your Code by Sections, It’s helpful to add clear section comments so you know where each piece of functionality lives.
+Section one: Breathing Exercise Code:
+
+#### // --- BREATHING EXERCISE SECTION --- //
+
+var socket = io();
+let breathingActive = false;  // global flag to prevent overlapping exercises
+
+socket.on('breathing_exercise', function(data) {
+    if (data.start) {
+        if (breathingActive) return;
+        breathingActive = true;
+
+#### Create an overlay that dims the background (50% black) with fade-in:
+
+let overlay = document.createElement("div");
+        overlay.id = "exerciseOverlay";
+        overlay.style.position = "fixed";
+        overlay.style.top = "0";
+        overlay.style.left = "0";
+        overlay.style.width = "100vw";
+        overlay.style.height = "100vh";
+        overlay.style.backgroundColor = "rgba(0, 0, 0, 0.5)";
+        overlay.style.zIndex = "100";
+        overlay.style.opacity = "0";
+        overlay.style.transition = "opacity 1s ease";    
+        document.body.appendChild(overlay);
+        requestAnimationFrame(() => {
+            overlay.style.opacity = "1";
+        });
+
+#### Set up the message container (centered) for the exercise messages:
+
+        const msgElem = document.getElementById('exerciseMessage');
+        msgElem.style.zIndex = "101";
+        msgElem.style.position = "fixed";
+        msgElem.style.top = "50%";
+        msgElem.style.left = "50%";
+        msgElem.style.transform = "translate(-50%, -50%)";
+        msgElem.style.textAlign = "center";
+        msgElem.innerHTML = "";
+
+#### Add a child span for text within the circle and define the helper:
+
+        let circleText = document.createElement("span");
+        circleText.style.transition = "opacity 0.5s ease";
+        circleText.style.opacity = "1";
+        circleText.style.fontFamily = "Narnia";
+        circleText.textContent = "INHALE";
+        circle.appendChild(circleText);
+               
+        function updateCircleText(newText, delay) {
+            setTimeout(() => {
+                circleText.style.opacity = "0";
+                setTimeout(() => {
+                    circleText.textContent = newText;
+                    circleText.style.opacity = "1";
+                }, 500);
+            }, delay);
+        }
+
+#### Define the breathing cycle function (12-second cycle):
+
+function runCycle(count) {
+        // Reset the circle for the cycle
+        circle.style.transition = "";
+        circle.style.width = "10vw";
+        circle.style.height = "10vw";
+        circle.style.fontSize = "3vw";
+        circleText.textContent = "INHALE";
+        circleText.style.opacity = "1";
+       
+#### Animate the expansion (inhale) over 3 seconds:
+
+        setTimeout(function() {
+            circle.style.transition = "width 3s, height 3s, font-size 3s";
+            circle.style.width = "40vw";
+            circle.style.height = "40vw";
+            circle.style.fontSize = "8vw";
+        }, 50);
+       
+        updateCircleText("HOLD", 3000);    // After 3 sec: update to "HOLD"
+        updateCircleText("EXHALE", 6000);  // After 6 sec: update to "EXHALE"
+
+#### Animate the contraction (exhale) over 3 seconds:
+
+        setTimeout(function() {
+            circle.style.transition = "width 3s, height 3s, font-size 3s";
+            circle.style.width = "10vw";
+            circle.style.height = "10vw";
+            circle.style.fontSize = "3vw";
+        }, 6000);
+        updateCircleText("HOLD", 9000);    // After 9 sec: update to "HOLD"
+
+#### After 12 sec: either start a new cycle or end the exercise:
+
+        setTimeout(function() {
+            if(count < 2) { // Adjust this count for more cycles if desired
+                runCycle(count + 1);
+            } else {
+
+#### In the “else”, fade out the circle and then show a final message:
+
+                circle.style.opacity = "0";
+                setTimeout(function() {
+                    msgElem.removeChild(circle);
+                    let finalMsg = document.createElement("span");
+                    finalMsg.textContent = "did you see the change?";
+                    finalMsg.style.fontFamily = "Narnia";
+                    finalMsg.style.fontSize = "3vw";
+                    finalMsg.style.color = "white";
+                    finalMsg.style.padding = "10px";
+                    finalMsg.style.borderRadius = "4px";
+                    finalMsg.style.textShadow = "0 0 10px rgba(0,0,0,0.8)";
+                    finalMsg.style.opacity = "0";
+                    finalMsg.style.transition = "opacity 1s ease";
+                    msgElem.appendChild(finalMsg);
+                    requestAnimationFrame(() => {
+                        finalMsg.style.opacity = "1";
+                    });
+                   
+#### Fade out the final message after 4 seconds:
+
+                    setTimeout(function() {
+                        finalMsg.style.opacity = "0";
+                        setTimeout(function() {
+                            msgElem.removeChild(finalMsg);
+                            breathingActive = false;
+
+                            // Remove the overlay so only videos remain
+                            let overlayElem = document.getElementById("exerciseOverlay");
+                            if (overlayElem) {
+                                document.body.removeChild(overlayElem);
+                            }
+                        }, 1000);
+                    }, 4000);
+                }, 1000); // Wait 1 sec for circle fade-out
+            }
+        }, 12000);
+    }
+
+#### Start the first breathing cycle:
+
+    runCycle(1);
+   
+}, 1000); // Wait 1 sec for complete fade-out of the initial message
+}, 4000); // Display initial message for 4 sec
+}
+});
+
+### // --- END OF BREATHING EXERCISE SECTION --- //
+
+Section two: Video Transition Logic:
+
+### // --- START VIDEO TRANSITION LOGIC SECTION --- //
+
+const deepfaceToKey = {
+  happy: "happy",
+  angry: "angry",
+  fear: "fear",
+  fearful: "fear",
+  sad: "sad",
+  surprise: "surprise",
+  surprised: "surprise"
+};
+
+const emotionToVideos = {
+  happy: [ Insert your “happy” videos like: "happy1.wav", "happy2.wav”],
+  angry: [Insert your “angry” videos here],
+  fear: [Insert your “fear” videos here],
+  sad: [Insert your “sad” videos here],
+  surprise: [Insert your “surprise” videos here]
+};
+
+const videoA = document.getElementById('videoA');
+const videoB = document.getElementById('videoB');
+let showingA = true;
+let lastEmotion = null;
+let lastFilename = null;
+let lastVideoSwitch = 0;
+let currentSwitchToken = 0; // To ensure sync
+
+videoA.classList.add('show');
+videoB.classList.add('hide');
+
+function crossfadeVideo(nextFilename, switchToken) {
+  const nextVideo = showingA ? videoB : videoA;
+  const prevVideo = showingA ? videoA : videoB;
+  nextVideo.src = `/static/videos/${nextFilename}?t=${Date.now()}`;
+  nextVideo.style.transition = 'none';
+  nextVideo.style.opacity = 0;
+  nextVideo.classList.add('show');
+  nextVideo.classList.remove('hide');
+  prevVideo.classList.add('show');
+  prevVideo.classList.remove('hide');
+  nextVideo.load();
+  nextVideo.oncanplay = () => {
+    // Check if this is still the latest switch
+    if (switchToken !== currentSwitchToken) return;
+void nextVideo.offsetWidth; // Force reflow for CSS transition
+
+#### Create a fade in/out using a timing and easing curve:
+
+nextVideo.style.transition = 'opacity 2.5s cubic-bezier(0.77, 0, 0.175, 1)';
+    prevVideo.style.transition = 'opacity 2.5s cubic-bezier(0.77, 0, 0.175, 1)';
+    nextVideo.style.opacity = 1;
+    prevVideo.style.opacity = 0.7; // initial softer overlap
+    setTimeout(() => {
+      prevVideo.style.opacity = 0;
+    }, 1200); // further fade out after 1.2 sec
+    nextVideo.play();
+    nextVideo.playbackRate = 1.0;
+    prevVideo.playbackRate = 1.0;
+    setTimeout(() => {
+      prevVideo.classList.remove('show');
+      prevVideo.classList.add('hide');
+      prevVideo.style.opacity = '';
+      nextVideo.style.opacity = '';
+    }, 2500); // by the end of the transition
+    showingA = !showingA;
+    lastFilename = nextFilename;
+  };
+}
+
+#### // --- END OF VIDEO TRANSITION LOGIC SECTION --- //
+
+Section three: Audio Transition Logic:
+
+#### // --- START AUDIO TRANSITION LOGIC SECTION --- //
+
+const audioMap = {
+  'flowers.mp4': '/static/Audio/flowers-audio.wav',
+  'water.mp4': '/static/Audio/water-audio.wav',
+  'clouds.mp4': '/static/Audio/clouds-audio.wav',
+  'waves.mp4': '/static/Audio/waves-audio.wav',
+  'fire.mp4': '/static/Audio/fire-audio.wav',
+  'lava.mp4': '/static/Audio/lava-audio.wav',
+  'jellyfish.mp4': '/static/Audio/jellyfish-audio.wav',
+  'storm.mp4': '/static/Audio/storm-audio.wav',
+  'thunder.mp4': '/static/Audio/thunder-audio.wav',
+  'fog.mp4': '/static/Audio/fog-audio.wav',
+  'rain.mp4': '/static/Audio/rain-audio.wav',
+  'rain2.mp4': '/static/Audio/rain2-audio.wav',
+  'blackhole.mp4': '/static/Audio/blackhole-audio.wav',
+  'stars.mp4': '/static/Audio/stars.wav',
+  'jellyfish2.mp4': '/static/Audio/jellyfish2-audio.wav',
+};
+
+let currentAudio = null;
+let fadeInterval = null;
+let fadeStep = 0.01;        // Smaller step for smooth fading
+let fadeIntervalTime = 30;  // Faster interval in ms for smoothness
+
+function getAudioForVideo(filename) {
+  // Normalize the name: remove spaces and lower case
+  const key = Object.keys(audioMap).find(k =>
+    k.replace(/\s+/g, '').toLowerCase() === filename.replace(/\s+/g, '').toLowerCase()
+  );
+  return key ? audioMap[key] : null;
+}
+
+function crossfadeAudio(newSrc, switchToken) {
+  if (!newSrc) {
+    if (currentAudio) {
+      let oldAudio = currentAudio;
+      if (fadeInterval) clearInterval(fadeInterval);
+      fadeInterval = setInterval(() => {
+        if (oldAudio.volume > fadeStep) {
+          oldAudio.volume = Math.max(0, oldAudio.volume - fadeStep);
+        } else {
+          oldAudio.volume = 0;
+          oldAudio.pause();
+          oldAudio.currentTime = 0;
+          clearInterval(fadeInterval);
+        }
+      }, fadeIntervalTime);
+      currentAudio = null;
+    }
+    return;
+  }
+  const absNewSrc = new URL(newSrc, window.location.origin).href;
+  if (currentAudio && currentAudio.src === absNewSrc) {
+    if (currentAudio.paused) currentAudio.play();
+    return;
+  }
+  if (fadeInterval) clearInterval(fadeInterval);
+  let oldAudio = currentAudio;
+  let nextAudio = new Audio(newSrc);
+  nextAudio.volume = 0;
+  nextAudio.loop = true;
+
+#### // --- END OF AUDIO TRANSITION LOGIC SECTION --- //
+
+Section four: Emotion Event Handling:
+
+#### // --- START EMOTION EVENT HANDLING --- //
+
+socket.on('emotion', function(data) {
+  const now = Date.now();
+  if (now - lastVideoSwitch < 10000) return;
+  lastVideoSwitch = now;
+  currentSwitchToken++;
+  const switchToken = currentSwitchToken;
+  const rawEmotion = data.emotion;
+  const emotion = deepfaceToKey[rawEmotion];
+  const videoList = emotionToVideos[emotion];
+  if (!videoList) return;
+
+#### Make sure a random video from the list gets selected, avoiding repetition:
+
+  let options = videoList.filter(v => v !== lastFilename);
+  if (options.length === 0) options = videoList;
+  const filename = options[Math.floor(Math.random() * options.length)];
+  if (!filename) return;
+
+#### Perform the video and audio crossfade:
+
+  crossfadeVideo(filename, switchToken);
+  const audioSrc = getAudioForVideo(filename);
+  if (audioSrc) {
+    crossfadeAudio(audioSrc, switchToken);
+  } else {
+    crossfadeAudio(null, switchToken);
+  }
+});
+
+#### // --- END OF EMOTION EVENT HANDLING --- //
+
+Section five: Welcome Overlay:
+
+#### // --- START welcome overlay --- //
+
+function showWelcomeOverlay() {
+  let overlay = document.getElementById('welcomeOverlay');
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.id = 'welcomeOverlay';
+    overlay.style.position = 'fixed';
+    overlay.style.top = '0';
+    overlay.style.left = '0';
+    overlay.style.width = '100vw';
+    overlay.style.height = '100vh';
+    overlay.style.zIndex = '9999';
+    overlay.style.transition = 'opacity 1s';
+    overlay.style.opacity = '1';
+    overlay.style.overflow = 'hidden';
+
+#### Add the video element acting as the background:
+
+    let videoBg = document.createElement('video');
+    videoBg.src = '/static/videos/welcome.mp4'; // Replace with your video file
+    videoBg.autoplay = true;
+    videoBg.loop = true;
+    videoBg.muted = true;
+    videoBg.playsInline = true; // For mobile browsers
+    videoBg.style.position = 'absolute';
+    videoBg.style.top = '50%';
+    videoBg.style.left = '50%';
+    videoBg.style.transform = 'translate(-50%, -50%)';
+    videoBg.style.minWidth = '100%';
+    videoBg.style.minHeight = '100%';
+    videoBg.style.width = 'auto';
+    videoBg.style.height = 'auto';
+    videoBg.style.zIndex = '-1';  // Video sits behind the text
+    overlay.appendChild(videoBg);
+
+#### Add a text container in the middle third of the screen:
+
+    let textContainer = document.createElement('div');
+    textContainer.style.position = 'absolute';
+    textContainer.style.left = '33.33vw';
+    textContainer.style.top = '0';
+    textContainer.style.width = '33.34vw';
+    textContainer.style.height = '100vh';
+    textContainer.style.display = 'flex';
+    textContainer.style.flexDirection = 'column';
+    textContainer.style.justifyContent = 'center';
+    textContainer.style.alignItems = 'center';
+    textContainer.style.wordBreak = 'break-word';
+    textContainer.style.textAlign = 'center';
+    textContainer.style.maxWidth = '100%';
+
+    let text = document.createElement('span');
+    text.textContent = 'WELCOME';
+    text.className = 'welcome-title';
+    text.style.fontSize = 'clamp(2rem, 6vw, 8vw)';
+    textContainer.appendChild(text);
+
+    let subtext = document.createElement('span');
+    subtext.textContent = 'Sit on the colored dot';
+    subtext.className = 'welcome-subtext';
+    subtext.style.fontSize = 'clamp(1.2rem, 3vw, 4vw)';
+    textContainer.appendChild(subtext);
+
+    overlay.appendChild(textContainer);
+    document.body.appendChild(overlay);
+
+    setTimeout(() => {
+      text.style.transition = 'opacity 0.7s';
+      subtext.style.transition = 'opacity 0.7s';
+      text.style.opacity = '0';
+      subtext.style.opacity = '0';
+      setTimeout(() => {
+        text.textContent = 'Change your facial expression and explore';
+        text.className = 'welcome-subtext';
+        text.style.textAlign = 'center';
+        text.style.fontSize = 'clamp(1.2rem, 3vw, 4vw)';
+        text.style.wordBreak = 'break-word';
+        text.style.maxWidth = '100%';
+        subtext.textContent = '';
+        text.style.opacity = '1';
+        subtext.style.opacity = '1';
+      }, 700);
+    }, 7500);
+
+  } else {
+    overlay.style.display = 'flex';
+    overlay.style.opacity = '1';
+  }
+  setTimeout(() => {
+    if (overlay) overlay.style.opacity = '0';
+    setTimeout(() => { if (overlay) overlay.style.display = 'none'; }, 1000);
+  }, 15000); // 15 seconds
+}
+#### Add this to show the welcome overlay on load and every 15 minutes:
+
+showWelcomeOverlay();
+setInterval(showWelcomeOverlay, 15 * 60 * 1000);
+
+#### // --- END OF WELCOME OVERLAY --- //
+
+
+
 
 
 
