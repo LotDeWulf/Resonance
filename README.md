@@ -652,9 +652,10 @@ setInterval(showWelcomeOverlay, 15 * 60 * 1000);
 #### If you want to upload this project to GitHub, you will need to make the static folder invisible in a .gitignore folder like this:
 
 static/Audio/
+
 static/videos/
 
-7. Run the application
+### 7. Run the application
 And lastly, with your virtual environment activated, run the server:
 
 python emotion.py
