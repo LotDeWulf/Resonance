@@ -74,18 +74,19 @@ To make this project come to life we used the ["Facial-Emotion-Recognition-using
 ### 1. Set up your project folder
 
 Create a new folder (for example, "resonance") and create the following structure inside it:
-<img width="263" alt="Scherm­afbeelding 2025-06-07 om 14 28 40" src="https://github.com/user-attachments/assets/16bc7c9f-d39c-4414-91fc-6fa7d9837c63" />
+
+<img width="400" alt="Scherm­afbeelding 2025-06-07 om 14 28 40" src="https://github.com/user-attachments/assets/16bc7c9f-d39c-4414-91fc-6fa7d9837c63" />
 
 
 
 ### 2. Create a virtual environment and install dependencies
 
-Open a terminal in your project folder and create a virtual environment. On Windows you can run:
+#### Open a terminal in your project folder and create a virtual environment. On Windows you can run:
 
 python -m venv venv 
 venv\Scripts\activate
 
-Then create a requirements.txt file with at least the following content:
+#### Then create a requirements.txt file with at least the following content:
 
 Flask 
 flask-socketio 
@@ -93,7 +94,7 @@ opencv-python
 deepface 
 eventlet # (or gevent, for SocketIO async support)
 
-Install them with:
+#### Install them with:
 
 pip install -r requirements.txt
 ![image](https://github.com/user-attachments/assets/8eb446a9-9699-4381-a1e1-02babad99a67)
