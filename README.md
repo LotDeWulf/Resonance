@@ -11,6 +11,14 @@ To make this project come to life we used the ["Facial-Emotion-Recognition-using
 - camera
 - speaker
 - music (we used music by conservatoire students)
+- Visual Studio code or any other coding program working with HTML/CSS/JS/Python
+-	Python Version 3.12
+-	PowerShell, terminal or any other CLI app
+-	Video files of your choice
+-	Audio files of your choice
+-	Touchdesigner
+![image](https://github.com/user-attachments/assets/cdaea181-8d2c-405c-ac6b-c7cb116e2cf0)
+
 
 ## Step 1: sketch
 - The first thing to do is sketch. Make lots of rough sketches until you find something you want to move forward with.
@@ -58,9 +66,53 @@ To make this project come to life we used the ["Facial-Emotion-Recognition-using
 <img width="200" alt="FLMNB1GMAJNZV1A" src="https://github.com/user-attachments/assets/878a642a-cb2a-4705-9598-c0b164fe09e7" />
 
 ## Step 4: music
-- We forwarded the different images to the conservatoire students so that they could make different compositions for the different images. You can also just find music pieces online that you can put under the images.
+- We forwarded the different images to the conservatoire students so that they could make different compositions for the different images. You can also just find music pieces online that you can put under the video's.
 
   ![FB67GE7MAJNZV6A](https://github.com/user-attachments/assets/ba1814ff-9229-49f6-8763-b76401dd937b)
+
+## Step 5: coding
+### 1. Set up your project folder
+
+Create a new folder (for example, "resonance") and create the following structure inside it:
+
+resonance/ 
+├── templates/ 
+│ └── index.html 
+├── static/ 
+│ ├── emotion.js 
+│ ├── style.css/ (for extra styling) 
+│ ├── Audio/ (place your audio files here)
+│ ├── fonts/ (place your font files here)
+│ ├── img/ (place your images here)
+│ └── videos/ (place your video files here) 
+├── [emotion.py](http://_vscodecontentref_/0) 
+└── [requirements.txt](http://_vscodecontentref_/1)
+![image](https://github.com/user-attachments/assets/7d39f305-71a6-45f9-9111-cfe8c44242cd)
+
+### 2. Create a virtual environment and install dependencies
+
+Open a terminal in your project folder and create a virtual environment. On Windows you can run:
+
+python -m venv venv 
+venv\Scripts\activate
+
+Then create a requirements.txt file with at least the following content:
+
+Flask 
+flask-socketio 
+opencv-python 
+deepface 
+eventlet # (or gevent, for SocketIO async support)
+
+Install them with:
+
+pip install -r requirements.txt
+![image](https://github.com/user-attachments/assets/8eb446a9-9699-4381-a1e1-02babad99a67)
+
+
+
+
+
 
 
 
