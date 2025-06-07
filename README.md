@@ -660,6 +660,324 @@ And lastly, with your virtual environment activated, run the server:
 
 python emotion.py
 
+## Step 6: Live performance (touchdesigner)
+
+### 1. Input music
+
+<img width="452" alt="image" src="https://github.com/user-attachments/assets/8bbcda71-786a-4a6f-988a-d46268a7ed3b" />
+
+#### audiodevin1 [AudioDeviceIn CHOP]
+For the input of the music you use the Audio Device In CHOP. In the parameters you set the device you want to use as microphone.
+
+#### AudioAnalyses [AudioAnalysis component] 
+To measure all kinds of properties of the music, you connect the input to the AudioAnalysis. The AudioAnalyses is a pre-made component of TouchDesigner to analyze the music and then easily converts it into data such as volume and beat detection.
+
+
+<img width="324" alt="image" src="https://github.com/user-attachments/assets/f04205e8-4ebf-4050-a0af-fd366a933488" />
+
+It is best to play around with these parameters yourself, based on your instrument or music, to get a feel for which parameters are most useful. In this example, only the 'Low' and 'Mid' are used.
+
+#### null [null CHOP]
+<img width="330" alt="image" src="https://github.com/user-attachments/assets/2066f351-0bc4-4305-bb8c-fc00fbf00895" />
+
+The AudioAnaelyses is then connected to a null CHOP. Which converts the data to usable data for subsequent CHOPS in this project
+
+
+### 2. Measuring the loudness
+
+<img width="452" alt="image" src="https://github.com/user-attachments/assets/a7560d58-7469-48e9-b180-cc49e8056718" />
+
+This is the layout for creating an analysis for the loudness of the music, and is thus related to the null CHOP from earlier.
+
+
+#### express_loud, express_mid, express_low [express CHOP]
+=>These are used to filter the data from the null. Here you can enter some python code, to determine when the music is considered loud, medium or soft.
+
+<img width="193" alt="image" src="https://github.com/user-attachments/assets/4c43d6db-1357-4a98-870a-fa080664fce8" />
+
+#### loud:
+1 if op('null')['mid'] > 0.5 else 0
+
+The express becomes 1 if the 'mid' value in the null is above 0.5, otherwise 0.
+
+#### mid:
+1 if op('null')['low'] > 0.03 else 0
+
+The express becomes 1 if the 'mid' value in the null is above 0.03, otherwise 0.
+
+#### soft:
+1 if 0.01 < op('null')['low'] < 0.03 else 0
+
+The express becomes 1 if the 'mid' value in the null is above 0.01 and below 0.03, otherwise 0.
+
+! Test it yourself with your instrument of choice, and adjust the value as needed. This may vary.
+
+#### logic_loud, logic_mid, logic_low [logic CHOP]
+=> helps to make the value binary (0 or 1). This is necessary so that the count recognizes it
+
+#### count_ loud, count_ mid, count_ low [count CHOP]
+=>counts the amount when the value becomes 1. There is a trigger set for this. so when the value is above 0.5 it is added.
+
+
+<img width="331" alt="image" src="https://github.com/user-attachments/assets/c54df31b-f10e-4608-bc56-09ee7fe20998" />
+
+#### timer loudness [timer CHOP]
+=> resets the CHOPs count to 0 every 6 seconds. So this provides a reset.
+
+<img width="214" alt="image" src="https://github.com/user-attachments/assets/9735cece-1065-4609-983d-c6dbb43fbc4e" />
+
+length set to 6 sec
+cycle turned on (timer repeats infinitely)
+on done set to restart: when the 6 seconds are done, it starts over again on start.
+
+With the CHOP timer you also add a little bit of code to reset the counts:
+
+<img width="452" alt="image" src="https://github.com/user-attachments/assets/347d4832-c33d-42dc-abe9-88e14e7398f6" />
+
+#### script_loudness [script DAT]
+=>This is a python code that determines the loudness of the music and puts an output in the text.
+
+First he retrieves the count data and based on how many times the beats are counted per volume, he determines the result.
+
+<img width="249" alt="image" src="https://github.com/user-attachments/assets/83c3401f-9c65-42d5-aa68-79f5ba158959" />
+
+The result is shown here.
+
+<img width="274" alt="image" src="https://github.com/user-attachments/assets/06ce63bf-91ee-4d17-9dd6-675ee8287aa2" />
+
+This is the layout for creating an analysis for the loudness of the music, and is also connected to the null CHOP of the AudioAnalyses.
+
+<img width="452" alt="image" src="https://github.com/user-attachments/assets/1bd7eb79-c1c4-4492-8011-f714eea98aa2" />
+
+#### express_peaks [express CHOP]
+express (connected to the null of audioAnalyses)
+=> This contains python code that detects all beats.
+
+1 if 0.01 < op('null')['low'] < 0.03 else 0
+value is 1 if the value in the null is above 0.03
+is very low as every stroke counts.
+
+<img width="289" alt="image" src="https://github.com/user-attachments/assets/f043ee65-4cc6-4030-8b66-7ebcbfd8a193" />
+
+#### logic_peaks [logic CHOP]
+=> convert value to binary value.
+
+#### count_peaks [count CHOP]
+=> counts all strokes, so number when the value becomes 1.
+
+#### timer_peaks [timer CHOP]
+=> resets the count to 0 every 4 seconds. So this provides a reset.
+
+length set to 4 seconds.
+cycle turned on (timer repeats infinitely)
+on done set to restart: when the 4 seconds are done, it starts over again on start.
+
+<img width="136" alt="image" src="https://github.com/user-attachments/assets/4824f4f9-4fb2-4384-acba-b5186049028c" />
+
+When the timer reaches onDone (i.e. when the 4 seconds end) the count (count_peaks) is reset.
+
+#### script_speed [script DAT]
+=> this is a python code that determines the speed of the music and puts an output in the text (speed_result).
+
+First he retrieves the data from the count and based on how often the strokes are counted he determines the speed.
+
+<img width="452" alt="image" src="https://github.com/user-attachments/assets/73c75c25-2a51-439a-a311-a10ea7662df3" />
+
+<img width="452" alt="image" src="https://github.com/user-attachments/assets/666ed86f-6887-4501-b6a7-8219d0175226" />
+
+### 3. Define rhythm
+
+<img width="452" alt="image" src="https://github.com/user-attachments/assets/96b288c1-0a6d-4684-9cba-a96bacff4d98" />
+
+#### This is the layout for creating an analysis to determine the rhythm type of the music, and is thus related to the null CHOP from earlier.
+
+express_rhytmh [express CHOP]
+express (connected to the null of audioAnalyses)
+
+=>This contains Python code that detects all hits
+
+<img width="215" alt="image" src="https://github.com/user-attachments/assets/2ca886e1-dce3-41e8-9f74-9281c764be6a" />
+
+1 if 0.01 < op('null')['low'] < 0.03 else 0
+value is 1 if the value in the null is above 0.03
+It is very low since every stroke counts.
+
+
+logic_ritme [logic CHOP]
+=> convert value to binary value.
+
+count_rhytmh [count CHOP]
+=> counts all strokes, so number when the value becomes 1.
+
+timer_rhytmh [timer CHOP]
+=> resets the count to 0 every 4 seconds. So this provides a reset
+
+<img width="229" alt="image" src="https://github.com/user-attachments/assets/011953e8-d77e-49db-8fa6-d5c8b552e7f5" />
+
+length set to 3 sec
+cycle turned on (timer repeats infinitely)
+on done set to restart: when the 3 seconds are done, it starts over again on start.
+
+<img width="452" alt="image" src="https://github.com/user-attachments/assets/4607f3df-34c4-49af-bf45-f59f479dc276" />
+
+##### Also a code is added to this timer CHOP to reset the count (count_rhythm).
+
+script_rhytmh [script DAT]
+=> this is a python code that determines the rhythm of the music and puts an output in the text (text_rhythm).
+
+First he retrieves the data from the count and based on this he determines whether the rhythm is more chaotic or more flowing.
+
+<img width="452" alt="image" src="https://github.com/user-attachments/assets/1b0895ad-be3e-4152-91de-2e5890559281" />
+
+<img width="452" alt="image" src="https://github.com/user-attachments/assets/fb79cfca-f7af-47f7-8212-3554a10757e1" />
+
+<img width="452" alt="image" src="https://github.com/user-attachments/assets/069d5492-c3ad-4987-8907-841e9692fbd2" />
+
+### 4. Output
+
+Now that you can measure 3 different elements, this data has to show a certain image.
+
+<img width="452" alt="image" src="https://github.com/user-attachments/assets/71deafb7-63e2-44c2-a792-c04903ea2871" />
+
+Here you see the size layout for showing the correct images.
+
+#### loudness_result, speed_result, rythmh_ [text TOPS]
+#### constant_loudness, constant_speed, constant_rhytmh [constant CHOPS]
+
+=>These are the results that the python codes have given with each analysis and that you use to determine and show the images. The constants give the data in the form of numbers that determine the intensity. The constants are actually the most important data since we are going to use the data from that.
+
+<img width="318" alt="image" src="https://github.com/user-attachments/assets/b093e80d-4aad-4664-b876-6a204ac0c694" />
+
+#### script_result [script DAT]
+#### combined_constant [constant CHOP]
+
+<img width="274" alt="image" src="https://github.com/user-attachments/assets/0a8dea13-aae1-4f1b-a387-718cb60deae0" />
+
+=> this is a python code that determines the image based on the different data and puts an output in the constant (combined_constant). The output is a number that is important for the switch later.
+
+<img width="452" alt="image" src="https://github.com/user-attachments/assets/75365660-9e6c-49e9-adca-e11bc2b472a6" />
+
+#### switch [switch TOP]
+#### multible moviefilein [moviefilein TOP]
+
+<img width="452" alt="image" src="https://github.com/user-attachments/assets/f666db17-03eb-4a80-860b-0c01089030af" />
+
+=> you add your chosen images in different moviefilein TOPs.
+These are all connected to the switch. If you drag the slider in the parameters of the switch, you will see the value as well as the image change. So every image has a value. Here you can determine which image you want per combination of data and adjust this in the results in the script DAT from earlier.
+
+
+The idea is that this value should match the combined_constant from earlier. That's why a little code needs to be added. ‘op('combined_constant')['chan1']’.
+
+<img width="338" alt="image" src="https://github.com/user-attachments/assets/9646ab0c-691a-43b8-bc18-7f93928dcb04" />
+
+#### cashe [cashe TOP]
+#### casheselect [casheselect TOP]
+
+<img width="452" alt="image" src="https://github.com/user-attachments/assets/db9ce514-7ac5-4a25-9e96-676ce288d4f0" />
+
+=> To create a fade effect we use the cashe, to store the previous image. The cashe is connected to the switch and reads the current image. The casheselect then gives the image of the number of frames ago that you set.
+
+<img width="452" alt="image" src="https://github.com/user-attachments/assets/116ab913-3b18-4730-ad77-b444065bef70" />
+
+#### timer_result [timer CHOP]
+#### fade_control [cross TOP]
+
+<img width="236" alt="image" src="https://github.com/user-attachments/assets/9b8edeec-128b-46ec-b272-02b21a25446c" />
+
+=> the fade_control is a cross that can make a fade between 2 images. We let that fade happen automatically using the timer.
+
+<img width="196" alt="image" src="https://github.com/user-attachments/assets/ea5c6b00-d391-42e8-9c1e-f0455e5190ba" />
+
+length set to 6 sec
+cycle turned on (timer repeats infinitely)
+on done set to restart: when the 6 seconds are done, it starts over again on start.
+
+<img width="452" alt="image" src="https://github.com/user-attachments/assets/cf456e62-03fb-4553-9f39-6296a2e6d9c8" />
+
+In the parameters here the cross is set based on the timer. The value goes from 0 to 1 and back in a time of 6 seconds. The value determines the fade between the 2 images.
+
+#### output [null TOP]
+#### window [window COMP]
+
+<img width="189" alt="image" src="https://github.com/user-attachments/assets/79e63ce0-56c2-42bf-b06f-c26371f82906" />
+
+=>The result in the fade_control will eventually become the end result. For this we connect it to a null (output). And use that null in a window COMP to show it as output.
+
+#### Normally you can now open the perform window using f4.
+
+! We personally have experienced problems with this that the window opens but the image does not change. To solve this problem open an extra screen with the perform window in the parameters of the window.
+
+<img width="452" alt="image" src="https://github.com/user-attachments/assets/641f2323-8373-4f6a-9bd7-4d025754281c" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
