@@ -74,20 +74,9 @@ To make this project come to life we used the ["Facial-Emotion-Recognition-using
 ### 1. Set up your project folder
 
 Create a new folder (for example, "resonance") and create the following structure inside it:
+<img width="263" alt="Scherm­afbeelding 2025-06-07 om 14 28 40" src="https://github.com/user-attachments/assets/16bc7c9f-d39c-4414-91fc-6fa7d9837c63" />
 
-resonance/ 
-├── templates/ 
-│ └── index.html 
-├── static/ 
-│ ├── emotion.js 
-│ ├── style.css/ (for extra styling) 
-│ ├── Audio/ (place your audio files here)
-│ ├── fonts/ (place your font files here)
-│ ├── img/ (place your images here)
-│ └── videos/ (place your video files here) 
-├── [emotion.py](http://_vscodecontentref_/0) 
-└── [requirements.txt](http://_vscodecontentref_/1)
-![image](https://github.com/user-attachments/assets/7d39f305-71a6-45f9-9111-cfe8c44242cd)
+
 
 ### 2. Create a virtual environment and install dependencies
 
