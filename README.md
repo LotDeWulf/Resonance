@@ -97,6 +97,102 @@ eventlet # (or gevent, for SocketIO async support)
 #### 2.3 Install them with: 
 pip install -r requirements.txt
 
+### 3. Write the HTML template
+Inside the templates folder, create index.html with basic HTML. Like this:
+
+<img width="434" alt="Scherm­afbeelding 2025-06-07 om 15 46 23" src="https://github.com/user-attachments/assets/44a4faa8-089a-4fc4-b8e3-ad10cb068e66" />
+
+### 4. Write the server code (emotion.py)
+In the root folder, create the file emotion.py and include the following Python code:
+
+#### First, Importing Modules and initializing the App
+
+from flask import Flask, render_template
+from flask_socketio import SocketIO
+import threading, time, cv2
+from deepface import DeepFace
+
+app = Flask(__name__, static_folder='static')
+socketio = SocketIO(app)
+
+#### Now, add the Global Variables and Emotion Mapping
+
+current_emotion = None
+
+EMOTION_MAPPING = {
+    "happy": "happy",
+    "angry": "angry",
+    "fear": "fear",
+    "fearful": "fear",
+    "sad": "sad",
+    "surprise": "surprise",
+    "surprised": "surprise"
+}
+
+#### Define the Route
+
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+#### Add the Emotion Detection function
+
+def detect_emotion(): 
+global current_emotion 
+cap = cv2.VideoCapture(0, cv2.CAP_DSHOW) 
+consecutive_trigger = 0 # Counter for consecutive trigger emotions (e.g., angry and fear) 
+
+while True: 
+ret, frame = cap.read() 
+if not ret: 
+continue 
+
+try: 
+result = DeepFace.analyze(frame, actions=['emotion'], enforce_detection=False) 
+detected = result[0]['dominant_emotion'] 
+mapped = EMOTION_MAPPING.get(detected) 
+
+if not mapped: 
+continue 
+
+print(f"Nieuwe emotie: {mapped}") 
+current_emotion = mapped 
+socketio.emit('emotion', {'emotion': mapped})
+
+#### Add the counter of consecutively triggered emotions anger and/or fear for the breathing exercise
+
+            # Count if the emotion is "angry" or "fear"
+            if mapped in ["angry", "fear"]:
+                consecutive_trigger += 1
+                print(f"Consecutive trigger count: {consecutive_trigger}", flush=True)
+                if consecutive_trigger == 4:
+                    print("Four consecutive trigger emotions detected. Starting breathing exercise.")
+                    socketio.emit('breathing_exercise', {'start': True})
+                    consecutive_trigger = 0  # Reset counter after triggering
+            else:
+                consecutive_trigger = 0
+
+#### Put a delay on the counter and handle errors
+
+        except Exception as e:
+            print("Fout:", e)
+
+        time.sleep(5)
+
+#### Run the Emotion Detection in a Background Thread
+
+threading.Thread(target=detect_emotion, daemon=True).start()
+
+#### Make sure the code launches on the start of the application
+
+if __name__ == '__main__':
+    socketio.run(app, host='0.0.0.0', port=5000)
+![image](https://github.com/user-attachments/assets/740b5109-c9b9-4c8e-9d1d-74216b5a98b4)
+
+
+
+
+
 
 
 
