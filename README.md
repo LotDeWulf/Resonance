@@ -96,7 +96,8 @@ eventlet # (or gevent, for SocketIO async support)
 
 #### 2.3 Install them with: 
 pip install -r requirements.txt
-![image](https://github.com/user-attachments/assets/8eb446a9-9699-4381-a1e1-02babad99a67)
+
+
 
 
 
