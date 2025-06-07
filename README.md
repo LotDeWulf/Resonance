@@ -187,7 +187,7 @@ threading.Thread(target=detect_emotion, daemon=True).start()
 
 if __name__ == '__main__':
     socketio.run(app, host='0.0.0.0', port=5000)
-![image](https://github.com/user-attachments/assets/740b5109-c9b9-4c8e-9d1d-74216b5a98b4)
+
 
 
 
