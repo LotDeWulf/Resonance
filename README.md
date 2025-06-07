@@ -81,12 +81,12 @@ Create a new folder (for example, "resonance") and create the following structur
 
 ### 2. Create a virtual environment and install dependencies
 
-#### Open a terminal in your project folder and create a virtual environment. On Windows you can run:
+#### 2.1 Open a terminal in your project folder and create a virtual environment. On Windows you can run:
 
 python -m venv venv 
 venv\Scripts\activate
 
-#### Then create a requirements.txt file with at least the following content:
+#### 2.2 Then create a requirements.txt file with at least the following content:
 
 Flask 
 flask-socketio 
@@ -94,8 +94,7 @@ opencv-python
 deepface 
 eventlet # (or gevent, for SocketIO async support)
 
-#### Install them with:
-pip install -r requirements.txt
+#### 2.3 Install them with: pip install -r requirements.txt
 ![image](https://github.com/user-attachments/assets/8eb446a9-9699-4381-a1e1-02babad99a67)
 
 
