@@ -14,10 +14,25 @@ To make this project come to life we used the ["Facial-Emotion-Recognition-using
 
 ## Step 1: sketch
 - The first thing to do is sketch. Make lots of rough sketches until you find something you want to move forward with.
+  
 ![FNZBQOHMAJNZU90](https://github.com/user-attachments/assets/19f98ee8-58d7-4e4d-a4c3-e36dc248bf5b)
 ![FUC439LMAJNZU94](https://github.com/user-attachments/assets/a957d423-33cf-4f75-8d84-9639a9227438)
 ![FLMENNNMAJNZU98](https://github.com/user-attachments/assets/bfe98118-6446-43d9-9d02-701a15623760)
 ![F02NYOZMAJNZU9D](https://github.com/user-attachments/assets/6c91fc47-a9c3-4918-83e4-01b1004459bf)
+
+## Step 2: flowchart
+- The next thing to do is to make a flow chart. That's a kind of diagram where you outline the flow of the installation. This way, you get an overview of which parts you are going to add in your userflow. You already get an insight into what the installation is going to look like, without designing screens.
+
+![F5NZ5PTMAJNZUI6](https://github.com/user-attachments/assets/b97b559d-8669-4199-bc87-c2502c9e2bbe)
+
+## Step 3: visuals
+### Visuals anger
+- Now we look for images to go with the emotions we want to portray, starting with anger.
+
+<img width="1512" alt="FWYKADDMAJNZUMS" src="https://github.com/user-attachments/assets/fd24957b-6e09-4ddd-b0bc-e2c74b3fef7b" />
+<img width="1512" alt="FMRO91KMAJNZUN2" src="https://github.com/user-attachments/assets/02501123-9591-4679-8e88-74605eeae706" />
+<img width="1512" alt="FE57SQMMAJNZUND" src="https://github.com/user-attachments/assets/1ee348f5-4e18-47e0-ad15-140ed63dd853" />
+
 
 
 ## Dependencies
