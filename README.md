@@ -58,7 +58,8 @@ https://vimeo.com/1091496735/1ee49ba82b?share=copy
 
 <img width="200" alt="FFOCTWHMAJNZUVN" src="https://github.com/user-attachments/assets/1ade5cc5-f4ae-4ae9-a41f-8b9a75305481" />
 <img width="200" alt="FNT50UPMAJNZUWG" src="https://github.com/user-attachments/assets/7c20dc5b-7f74-49c1-8e15-6feb8395202a" />
-<img width="200" alt="FMUTRU8MAJNZUX6" src="https://github.com/user-attachments/assets/5384ce86-c4bc-4b13-8c25-d9aa189b6db8" />
+<img width="200" alt="Scherm­afbeelding 2025-06-08 om 13 56 59" src="https://github.com/user-attachments/assets/e8eed7f9-5fe4-406b-9ba7-b082ca826de2" />
+
 
 ### Visuals fear
 
