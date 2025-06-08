@@ -4,6 +4,8 @@ To make this project come to life we used the ["Facial-Emotion-Recognition-using
 - Give this repository a ⭐ if you liked it, we would appreciate it!
 - The Resonance team <3
 
+https://vimeo.com/1091496735/1ee49ba82b?share=copy
+
 # Instructables
 
 ## Supplies
