@@ -1,4 +1,5 @@
 ![WhatsApp Image 2025-06-07 at 23 30 44](https://github.com/user-attachments/assets/0bae34b5-02ce-4a2d-b043-c866f47e1d57)
+https://vimeo.com/1091496735/1ee49ba82b?share=copy
 
 # RESONANCE
 This project implements real-time facial emotion detection using the `deepface` library and OpenCV. It captures video from the webcam, detects faces, predicts the emotions associated with each face and selects a video and musical piece reflecting the most dominant emotion every few seconds. 
